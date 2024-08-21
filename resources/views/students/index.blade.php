@@ -97,51 +97,51 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="ad_soyad" class="form-label">Ad Soyad</label>
-                                <input type="text" class="form-control" id="ad_soyad" name="ad_soyad" required>
+                                <input type="text" class="form-control" id="ad_soyad" name="ad_soyad" required autocomplete="off">
                             </div>
                             <div class="col-md-6">
                                 <label for="tc" class="form-label">TC Kimlik No</label>
-                                <input type="text" class="form-control" id="tc" name="tc" maxlength="11" required>
+                                <input type="text" class="form-control" id="tc" name="tc" maxlength="11" required autocomplete="off">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="baba_adi" class="form-label">Baba Adı</label>
-                                <input type="text" class="form-control" id="baba_adi" name="baba_adi" required>
+                                <input type="text" class="form-control" id="baba_adi" name="baba_adi" required autocomplete="off">
                             </div>
                             <div class="col-md-6">
                                 <label for="dogum_tarihi" class="form-label">Doğum Tarihi</label>
-                                <input type="date" class="form-control" id="dogum_tarihi" name="dogum_tarihi" required>
+                                <input type="date" class="form-control" id="dogum_tarihi" name="dogum_tarihi" required autocomplete="off">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="telefon" class="form-label">Telefon</label>
-                                <input type="text" class="form-control" id="telefon" name="telefon" required>
+                                <input type="text" class="form-control" id="telefon" name="telefon" required autocomplete="off">
                             </div>
                             <div class="col-md-6">
                                 <label for="dogum_yeri" class="form-label">Doğum Yeri</label>
-                                <input type="text" class="form-control" id="dogum_yeri" name="dogum_yeri" required>
+                                <input type="text" class="form-control" id="dogum_yeri" name="dogum_yeri" required autocomplete="off">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="adres" class="form-label">Adres</label>
-                                <input type="text" class="form-control" id="adres" name="adres" required>
+                                <input type="text" class="form-control" id="adres" name="adres" required autocomplete="off">
                             </div>
                             <div class="col-md-6">
                                 <label for="email" class="form-label">E-Mail</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <input type="email" class="form-control" id="email" name="email" required autocomplete="off">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="bolum" class="form-label">Kazandığınız Bölüm</label>
-                                <input type="text" class="form-control" id="bolum" name="bolum" required>
+                                <input type="text" class="form-control" id="bolum" name="bolum" required autocomplete="off">
                             </div>
                             <div class="col-md-6">
                                 <label for="ogrenci_belgesi" class="form-label">Öğrenci Belgesi (PDF)</label>
