@@ -88,7 +88,7 @@
             <div class="col-md-8">
                 <div class="form-container">
                     <div class="header-section">
-                        <img src="http://bilet.kirklareli.bel.tr/img/belediye_logo.webp" alt="Belediye Logo">
+                        <img src="/public/belediye_logo.webp" alt="Belediye Logo">
                         <h2 class="form-title">Kırklareli Belediye Başkanlığı<br>39 Kent Kart<br>Öğrenci Başvuru Formu</h2>
                     </div>
 
