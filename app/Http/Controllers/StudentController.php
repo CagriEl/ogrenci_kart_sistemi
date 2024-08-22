@@ -73,23 +73,23 @@ class StudentController extends Controller
     }
 
     public function update(Request $request, Student $student)
-    {
-        $request->validate([
-            'sicil' => 'nullable|string|max:255',
-            'durum' => 'required|string',
-        ]);
-    
-        $student->sicil = $request->input('sicil'); // Sicil numarasını güncelle
-        $student->durum = $request->input('durum'); // Durumu güncelle
-        $student->save(); // Veritabanına kaydet
-    
-        // Eğer durum 'Sicil Oluştu - Tahakkuk Girildi' olarak güncellendiyse e-posta gönder
-        if ($student->durum == 'Sicil Oluştu - Tahakkuk Girildi') {
-            \Mail::to($student->email)->send(new SicilOlusturulduMail($student));
-        }
-    
-        return redirect()->route('admin.students.index')->with('success', 'Öğrenci kaydı başarıyla güncellendi.');
+{
+    $request->validate([
+        'sicil' => 'nullable|string|max:255',
+        'durum' => 'required|string',
+    ]);
+
+    $student->sicil = $request->input('sicil');
+    $student->durum = $request->input('durum');
+    $student->save();
+
+    // Sicil numarası oluşturulduğunda e-posta gönder
+    if ($student->durum == 'Sicil Oluştu - Tahakkuk Girildi') {
+        Mail::to($student->email)->send(new SicilOlusturulduMail($student));
     }
+
+    return redirect()->route('admin.students.index')->with('success', 'Öğrenci kaydı başarıyla güncellendi.');
+}
     
     // Dosya indirme işlemi
     public function downloadFile($id, $file_type)
