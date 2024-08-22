@@ -177,6 +177,12 @@
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary">Başvuru Gönder</button>
                         </div>
+                            @if(session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
                     </form>
 
                     <footer>
