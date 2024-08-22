@@ -145,25 +145,25 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="ogrenci_belgesi" class="form-label">Öğrenci Belgesi (PDF)</label>
-                                <input type="file" class="form-control" id="ogrenci_belgesi" name="ogrenci_belgesi" accept="application/pdf">
+                                <input type="file" class="form-control" id="ogrenci_belgesi" name="ogrenci_belgesi" accept="application/pdf" required>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="kimlik_on" class="form-label">Kimlik Ön Görsel</label>
-                                <input type="file" class="form-control" id="kimlik_on" name="kimlik_on" accept="image/*">
+                                <input type="file" class="form-control" id="kimlik_on" name="kimlik_on" accept="image/*" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="kimlik_arka" class="form-label">Kimlik Arka Görsel</label>
-                                <input type="file" class="form-control" id="kimlik_arka" name="kimlik_arka" accept="image/*">
+                                <input type="file" class="form-control" id="kimlik_arka" name="kimlik_arka" accept="image/*" required>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label for="vesikalik" class="form-label">Vesikalık Fotoğraf</label>
-                                <input type="file" class="form-control" id="vesikalik" name="vesikalik" accept="image/*">
+                                <input type="file" class="form-control" id="vesikalik" name="vesikalik" accept="image/*" required>
                             </div>
                         </div>
 
