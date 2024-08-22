@@ -10,6 +10,32 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+
+        .table thead th {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table tbody td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -76,47 +102,41 @@
                         <td>{{ $student->bolum }}</td>
                         <td>
                             @if($student->ogrenci_belgesi)
-                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'ogrenci_belgesi']) }}">
-                                    Öğrenci Belgesi (PDF)
+                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'ogrenci_belgesi']) }}" class="btn btn-info btn-sm">
+                                    PDF İndir
                                 </a>
                             @else
                                 Yok
                             @endif
                         </td>
-                        
                         <td>
                             @if($student->kimlik_on)
-                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'kimlik_on']) }}">
-                                    Kimlik Ön İndir
+                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'kimlik_on']) }}" class="btn btn-info btn-sm">
+                                    Ön Yüz İndir
                                 </a>
                             @else
                                 Yok
                             @endif
                         </td>
-                        
                         <td>
                             @if($student->kimlik_arka)
-                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'kimlik_arka']) }}">
-                                    Kimlik Arka İndir
+                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'kimlik_arka']) }}" class="btn btn-info btn-sm">
+                                    Arka Yüz İndir
                                 </a>
                             @else
                                 Yok
                             @endif
                         </td>
-                        
                         <td>
                             @if($student->vesikalik)
-                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'vesikalik']) }}">
+                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'vesikalik']) }}" class="btn btn-info btn-sm">
                                     Vesikalık İndir
                                 </a>
                             @else
                                 Yok
                             @endif
                         </td>
-                        
-                        
                         <td>{{ $student->sicil }}</td>
-                        
                         <td>{{ $student->durum }}</td>
                         <td>
                             <a href="{{ route('admin.students.edit', $student->id) }}" class="btn btn-warning btn-sm">Düzenle</a>

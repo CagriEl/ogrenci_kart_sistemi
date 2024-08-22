@@ -95,6 +95,11 @@
 
                     <form action="{{ route('students.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="ad_soyad" class="form-label">Ad Soyad</label>
@@ -178,11 +183,7 @@
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary">Başvuru Gönder</button>
                         </div>
-                            @if(session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
+                         
 
                     </form>
 
