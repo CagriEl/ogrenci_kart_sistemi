@@ -17,7 +17,7 @@ class StudentController extends Controller
             'ad_soyad' => 'required|string|max:255',
             'tc' => 'required|digits:11|unique:students',
             'telefon' => 'required|string|max:15',
-            'adres' => 'required|string|max:255',
+            'adres' => 'required|string|max:700',
             'bolum' => 'required|string|max:255',
             'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:2048',
             'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',

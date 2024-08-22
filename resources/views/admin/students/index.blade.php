@@ -9,6 +9,12 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
+        }
+
+        .table {
+            width: 100%;
+            margin: 0 auto;
         }
 
         .table thead th {
@@ -59,7 +65,7 @@
     </nav>
 
     <div class="container mt-4">
-        <h1>Öğrenci Kayıtları</h1>
+        <h1 class="text-center">Öğrenci Kayıtları</h1>
 
         @if(session('success'))
             <div class="alert alert-success">

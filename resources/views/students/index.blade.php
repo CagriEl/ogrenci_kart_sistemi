@@ -136,7 +136,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="adres" class="form-label">Adres</label>
-                                <input type="text" class="form-control" id="adres" name="adres" required autocomplete="off">
+                                <input type="textarea" class="form-control" id="adres" name="adres" required autocomplete="off">
                             </div>
                             <div class="col-md-6">
                                 <label for="email" class="form-label">E-Mail</label>
