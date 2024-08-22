@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #ffffff; /* Arka planı mavi yap */
+            background-color: #ffffff;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -74,11 +74,20 @@
         .header-section img {
             margin-right: 20px;
             width: 100px;
-            filter: brightness(0) invert(1); /* Logoyu beyaz yap */
+            filter: brightness(0) invert(1);
         }
 
         footer span {
             color: red;
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+            margin-top: 20px;
+            border-radius: 10px;
+            text-align: center;
         }
     </style>
 </head>
@@ -177,12 +186,12 @@
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary">Başvuru Gönder</button>
                         </div>
-                            @if(session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
-                            @endif
 
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
                     </form>
 
                     <footer>
