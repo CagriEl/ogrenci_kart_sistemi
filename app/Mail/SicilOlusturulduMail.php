@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Mail;
-
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -19,11 +17,9 @@ class SicilOlusturulduMail extends Mailable
 
     public function build()
     {
-        return $this->view('emails.sicil_olusturuldu')
+        return $this->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
                     ->subject('Sicil Numarası Oluşturuldu')
-                    ->with([
-                        'adSoyad' => $this->student->ad_soyad,
-                        'sicil' => $this->student->sicil,
-                    ]);
+                    ->view('emails.sicil_olusturuldu')
+                    ->with('student', $this->student);
     }
 }
