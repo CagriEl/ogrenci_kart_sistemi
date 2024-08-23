@@ -48,16 +48,16 @@
                         <td>{{ $student->email }}</td>
                         <td>{{ $student->sicil }}</td>
                         <td>{{ $student->durum }}</td>
+                        <td>
+                            <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
-            <td>
-                <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">Sil</button>
-                </form>
-            </td>
             
         </table>
         
