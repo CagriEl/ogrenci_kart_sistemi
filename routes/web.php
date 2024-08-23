@@ -15,7 +15,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/students/{student}/edit', [StudentController::class, 'edit'])->name('admin.students.edit');
     Route::put('/admin/students/{student}', [StudentController::class, 'update'])->name('admin.students.update');
     Route::delete('/admin/students/{student}', [StudentController::class, 'destroy'])->name('admin.students.destroy');
-    Route::get('/admin/basilan-kartlar', [StudentController::class, 'basilanKartlar'])->name('admin.basilan-kartlar');
+    Route::get('/admin/basilan-kartlar', [StudentController::class, 'basilanKartlar'])->name('admin.basilan_kartlar');
 
 });
 
