@@ -21,6 +21,7 @@ class SicilOlusturulduMail extends Mailable
     public function build()
     {
         return $this->view('emails.sicil_olusturuldu')
+                    ->subject('Siciliniz Oluşturulmuştur')
                     ->with([
                         'adSoyad' => $this->student->ad_soyad,
                         'sicil' => $this->student->sicil,
