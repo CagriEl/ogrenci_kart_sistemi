@@ -93,10 +93,10 @@ class StudentController extends Controller
     
     }
     public function basilanKartlar()
-    {
-        $basilanKartlar = Student::where('durum', 'Kart Basıldı')->paginate(20); // get() yerine paginate(20) kullanıyoruz
-        return view('admin.students.basilan_kartlar', compact('basilanKartlar'));
-    }
+{
+    $students = Student::where('durum', 'Kart Basıldı')->paginate(20);
+    return view('admin.students.basilan_kartlar', compact('students'));
+}
     
 
     // Öğrenci kaydının düzenlendiği metot
