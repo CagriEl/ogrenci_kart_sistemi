@@ -13,7 +13,8 @@
     <p>39 Kent Kart ödemenizi <a href="https://e-belediye.kirklareli.bel.tr">E-Belediye</a> sistemi üzerinden veya belediye veznelerimizden ödeyebilirsiniz.
        <br> <br>Teşekkür ederiz.</p>
         
-    <h3> Not: Kartınızı teslim almaya gelirken ödeme dekontunuza ibraz etmeniz gerekmektedir.<br>
+    <h3> Not: Kartınızı teslim almaya gelirken ödeme dekontunuzu ibraz etmeniz gerekmektedir.<br>
+        Kart başvuru tarihinizden itibaren 30 gün içerisinde ödemenizi yapmanız gerekmektedir. Yapmadığınız taktirde yasal faiz uygulanacaktır.<br>
         Kartınızı Kırklareli Belediye Başkanlığı Ulaşım Hizmetleri Müdürlüğünden alabilirsiniz.
         <br>Adres: Karaca İbrahim Mahallesi. Kurtuluş Cd. Ulaşım Hizmetleri Müdürlüğü
     </h3>
