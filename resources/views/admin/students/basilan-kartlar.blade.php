@@ -40,6 +40,7 @@
             <tbody>
                 @foreach($basilanKartlar as $student)
                     <tr>
+                        <td>{{ $student->id }}</td>
                         <td>{{ $student->ad_soyad }}</td>
                         <td>{{ $student->tc }}</td>
                         <td>{{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</td>
