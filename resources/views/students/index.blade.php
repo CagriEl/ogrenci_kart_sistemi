@@ -94,9 +94,9 @@
         });
             document.getElementById('telefon').addEventListener('input', function(e) {
                 const phone = this.value.replace(/\D/g, ''); // Sadece rakamları alır
-                    if (phone.length > 11) {
-                        alert('Telefon numarası en fazla 11 haneli olmalıdır!');
-                        this.value = phone.substring(0, 11); // Sadece ilk 11 haneyi tutar
+                    if (phone.length > 15) {
+                        alert('Telefon numarası en fazla 15 haneli olmalıdır!');
+                        this.value = phone.substring(0, 15); // Sadece ilk 11 haneyi tutar
                     }
                 });
     </script>
@@ -144,7 +144,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="telefon" class="form-label">Telefon</label>
-                                <input type="tel" class="form-control" id="telefon" name="telefon" required autocomplete="off" maxlength="11" pattern="\d{10,11}" title="Telefon numarası 10 veya 11 haneli olmalıdır.">
+                                <input type="tel" class="form-control" id="telefon" name="telefon" required autocomplete="off" maxlength="15" pattern="\d{10,15}" title="Telefon numarası 10 veya 15 haneli olmalıdır.">
                             </div>
                             <div class="col-md-6">
                                 <label for="dogum_yeri" class="form-label">Doğum Yeri</label>

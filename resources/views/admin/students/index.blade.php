@@ -105,7 +105,7 @@
                         <td>{{ $student->ad_soyad }}</td>
                         <td>{{ $student->tc }}</td>
                         <td>{{ $student->baba_adi }}</td>
-                        <td>{{ $student->dogum_tarihi }}</td>
+                        <td>{{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</td>
                         <td>{{ $student->dogum_yeri }}</td>
                         <td>{{ $student->telefon }}</td>
                         <td>{{ $student->adres }}</td>
