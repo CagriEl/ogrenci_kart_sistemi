@@ -95,7 +95,7 @@ class StudentController extends Controller
     public function basilanKartlar()
 {
     $students = Student::where('durum', 'Kart Basıldı')->paginate(20);
-    return view('admin.students.basilan_kartlar', compact('students'));
+    return view('admin.students.basilan-kartlar', compact('students'));
 }
     
 
