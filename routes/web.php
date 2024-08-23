@@ -31,5 +31,5 @@ Route::get('/admin/approved-students', [StudentController::class, 'approvedStude
 
 Route::get('/admin/students/{id}/download/{file_type}', [StudentController::class, 'downloadFile'])->name('admin.students.download');
 Route::middleware(['auth'])->group(function () {
-    Route::get('admin/students/basilan-kartlar', [StudentController::class, 'basilanKartlar'])->name('admin.students.basilan_kartlar');
+    Route::get('admin/basilan-kartlar', [StudentController::class, 'basilanKartlar'])->name('admin.students.basilan_kartlar');
 });
