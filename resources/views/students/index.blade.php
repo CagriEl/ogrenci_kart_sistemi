@@ -82,6 +82,24 @@
             color: red;
         }
     </style>
+     <script>
+        document.getElementById('dogum_tarihi').addEventListener('input', function(e) {
+            const date = new Date(this.value);
+            const year = date.getFullYear();
+    
+            if (year < 1900 || year > 2009) {
+                alert('Doğum tarihi 1900-2009 arasında olmalıdır!');
+                this.value = ''; // Hatalı girişi temizler
+            }
+        });
+            document.getElementById('telefon').addEventListener('input', function(e) {
+                const phone = this.value.replace(/\D/g, ''); // Sadece rakamları alır
+                    if (phone.length > 11) {
+                        alert('Telefon numarası en fazla 11 haneli olmalıdır!');
+                        this.value = phone.substring(0, 11); // Sadece ilk 11 haneyi tutar
+                    }
+                });
+    </script>
 </head>
 <body>
     <div class="container mt-4">
@@ -89,7 +107,7 @@
             <div class="col-md-8">
                 <div class="form-container">
                     <div class="header-section">
-                        <img src="/public/belediye_logo.webp" alt="Belediye Logo">
+                        <img src="https://bilet.kirklareli.bel.tr/public/belediye_logo.webp" alt="Belediye Logo">
                         <h2 class="form-title">Kırklareli Belediye Başkanlığı<br>39 Kent Kart<br>Öğrenci Başvuru Formu</h2>
                     </div>
 
@@ -116,16 +134,17 @@
                                 <label for="baba_adi" class="form-label">Baba Adı</label>
                                 <input type="text" class="form-control" id="baba_adi" name="baba_adi" required autocomplete="off">
                             </div>
+                           
                             <div class="col-md-6">
                                 <label for="dogum_tarihi" class="form-label">Doğum Tarihi</label>
-                                <input type="date" class="form-control" id="dogum_tarihi" name="dogum_tarihi" required autocomplete="off">
+                                <input type="date" class="form-control" id="dogum_tarihi" name="dogum_tarihi" required autocomplete="off" min="1900-01-01" max="2009-12-31">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="telefon" class="form-label">Telefon</label>
-                                <input type="text" class="form-control" id="telefon" name="telefon" required autocomplete="off">
+                                <input type="tel" class="form-control" id="telefon" name="telefon" required autocomplete="off" maxlength="11" pattern="\d{10,11}" title="Telefon numarası 10 veya 11 haneli olmalıdır.">
                             </div>
                             <div class="col-md-6">
                                 <label for="dogum_yeri" class="form-label">Doğum Yeri</label>
@@ -188,7 +207,7 @@
                     </form>
 
                     <footer>
-                        <p>Kırklareli Belediye Başkanlığı Bilgi İşlem Müdürlüğü tarafından <span>❤</span> ile kodlandı.</p>
+                        <p>Kırklareli Belediye Başkanlığı Bilgi İşlem Müdürlüğü tarafından <span style="color:white;">❤</span> ile kodlandı.</p>
                     </footer>
                 </div>
             </div>

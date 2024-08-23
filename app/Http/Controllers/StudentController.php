@@ -16,48 +16,68 @@ class StudentController extends Controller
         $request->validate([
             'ad_soyad' => 'required|string|max:255',
             'tc' => 'required|digits:11|unique:students',
-            'telefon' => 'required|string|max:15',
+            'telefon' => 'required|digits_between:10,11', // Telefon numarasını 10 veya 11 hane ile sınırla
             'adres' => 'required|string|max:700',
             'bolum' => 'required|string|max:255',
             'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:2048',
             'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'kimlik_arka' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'vesikalik' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'dogum_tarihi' => 'required|date',
+            'dogum_tarihi' => [
+                'required',
+                'date',
+                'before:today', // Tarih bugünden önce olmalı
+                function ($attribute, $value, $fail) {
+                    $year = explode('-', $value)[0];
+                    if (strlen($year) !== 4 || !ctype_digit($year)) {
+                        $fail('Doğum tarihi geçersiz. Yıl kısmı 4 haneli olmalıdır.');
+                    }
+                },
+            ],
             'baba_adi' => 'required|string|max:255',
             'dogum_yeri' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'aydinlatma_onay' => 'accepted',
         ]);
-
+    
+        // 18 yaş kontrolü
+        $dogumTarihi = new \DateTime($request->dogum_tarihi);
+        $today = new \DateTime();
+        $age = $today->diff($dogumTarihi)->y;
+    
+        if ($age < 18) {
+            return redirect()->back()->withErrors(['dogum_tarihi' => '18 yaşından küçükler başvuru yapamaz.']);
+        }
+    
         // Dosya Yükleme ve Veritabanı Kayıt İşlemleri
         $data = $request->all();
         $data['aydinlatma_onay'] = $request->has('aydinlatma_onay') ? true : false;
-
+    
         if ($request->hasFile('ogrenci_belgesi')) {
             $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->store('ogrenci_belgeleri', 'public');
         }
-
+    
         if ($request->hasFile('vesikalik')) {
             $filename = $request->tc . '_' . str_replace(' ', '_', $request->ad_soyad) . '_vesikalik.' . $request->file('vesikalik')->getClientOriginalExtension();
             $data['vesikalik'] = $request->file('vesikalik')->storeAs('vesikalik_fotograflar', $filename, 'public');
         }
-
+    
         if ($request->hasFile('kimlik_on')) {
             $filename = $request->tc . '_' . str_replace(' ', '_', $request->ad_soyad) . '_kimlik_on.' . $request->file('kimlik_on')->getClientOriginalExtension();
             $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
-
+    
         if ($request->hasFile('kimlik_arka')) {
             $filename = $request->tc . '_' . str_replace(' ', '_', $request->ad_soyad) . '_kimlik_arka.' . $request->file('kimlik_arka')->getClientOriginalExtension();
             $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
-
+    
         // Veritabanına Kayıt
         Student::create($data);
-
+    
         return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı.');
     }
+    
 
     // Öğrenci kayıtlarının listelendiği admin paneli
     public function adminIndex()
