@@ -98,7 +98,7 @@ class StudentController extends Controller
         $students = Student::where('durum', 'Kart Basıldı')->paginate(20);
     
         // 'students' değişkeniyle birlikte view'a gönder
-        return view('admin.students.basilan-kartlar', compact('students'));
+        return view('admin.students.basilan_kartlar', compact('students'));
     }
     
     
