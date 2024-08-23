@@ -27,6 +27,7 @@
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Ad Soyad</th>
                     <th>TC Kimlik No</th>
                     <th>Doğum Tarihi</th>
