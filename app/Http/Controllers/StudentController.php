@@ -75,6 +75,13 @@ class StudentController extends Controller
             $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
             $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
+        if ($request->hasFile('ogrenci_belgesi')) {
+            $originalName = pathinfo($request->file('ogrenci_belgesi')->getClientOriginalName(), PATHINFO_FILENAME);
+            $shortenedName = Str::limit($originalName, 20, ''); // Dosya adını 20 karakterle sınırlıyoruz
+            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('ogrenci_belgesi')->getClientOriginalExtension();
+            $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->storeAs('ogrenci_belgeleri', $filename, 'public');
+        }
+        
             
         // Veritabanına Kayıt
         Student::create($data);
@@ -146,7 +153,7 @@ class StudentController extends Controller
                 break;
             case 'ogrenci_belgesi':
                 $filePath = $student->ogrenci_belgesi;
-                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_ogrenci_belgesi.pdf' . pathinfo($filePath, PATHINFO_EXTENSION);
+                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_ogrenci_belgesi.' . pathinfo($filePath, PATHINFO_EXTENSION);
                 break;
             default:
                 abort(404);
@@ -155,7 +162,7 @@ class StudentController extends Controller
         if ($filePath && Storage::disk('public')->exists($filePath)) {
             $file = Storage::disk('public')->get($filePath);
             $mimeType = Storage::disk('public')->mimeType($filePath);
-
+    
             return response($file, 200)
                 ->header('Content-Type', $mimeType)
                 ->header('Content-Disposition', 'attachment; filename="'.$downloadName.'"');
