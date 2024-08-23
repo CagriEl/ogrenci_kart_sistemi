@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .container {
-            max-width: 1500px;
+            max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -72,10 +72,14 @@
                 {{ session('success') }}
             </div>
         @endif
-
+        <div class="d-flex justify-content-center">
+            {{ $students->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
+        
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
+                    <th>Id</th>
                     <th>Ad Soyad</th>
                     <th>TC Kimlik No</th>
                     <th>Baba Adı</th>
@@ -97,6 +101,7 @@
             <tbody>
                 @foreach($students as $student)
                     <tr>
+                        <td>{{$student->id}}</td>
                         <td>{{ $student->ad_soyad }}</td>
                         <td>{{ $student->tc }}</td>
                         <td>{{ $student->baba_adi }}</td>

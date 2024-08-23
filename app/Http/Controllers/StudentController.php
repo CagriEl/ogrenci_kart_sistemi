@@ -62,7 +62,8 @@ class StudentController extends Controller
     // Öğrenci kayıtlarının listelendiği admin paneli
     public function adminIndex()
     {
-        $students = Student::all();
+        
+        $students = Student::paginate(20); // Sayfalama başına 20 kayıt
         return view('admin.students.index', compact('students'));
     }
 
@@ -127,6 +128,7 @@ class StudentController extends Controller
         } else {
             abort(404, 'Dosya bulunamadı.');
         }
+    
     }
 
     public function destroy(Student $student)
@@ -134,4 +136,6 @@ class StudentController extends Controller
         $student->delete();
         return redirect()->route('admin.students.index')->with('success', 'Kayıt başarıyla silindi.');
     }
+    
+
 }
