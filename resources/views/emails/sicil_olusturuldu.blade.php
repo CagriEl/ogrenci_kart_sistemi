@@ -6,7 +6,7 @@
     <title>39 Kent Kart - Sicil Numaranız Oluşturuldu</title>
 </head>
 <body>
-    <h1>Merhaba, sayın {{ $adSoyad }}</h1>
+    <h1>Merhaba, Sayın {{ $adSoyad }}</h1>
     <p>Öğrenci kartı başvurunuz başarıyla alınmıştır ve sicil numaranız oluşturulmuştur.</p>
     <p>Sicil Numaranız: <strong>{{ $sicil }}</strong></p>
 
