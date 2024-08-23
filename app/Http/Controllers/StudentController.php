@@ -97,7 +97,7 @@ class StudentController extends Controller
         // Durumu 'Kart Basıldı' olan öğrencileri çeker
         $basilanKartlar = Student::where('durum', 'Kart Basıldı')->paginate(20);
     
-        return view('admin.students.basilan_kartlar', compact('basilanKartlar'));
+        return view('admin.students.basilan-kartlar', compact('basilanKartlar'));
     }
     
 
