@@ -146,7 +146,7 @@ class StudentController extends Controller
                 break;
             case 'ogrenci_belgesi':
                 $filePath = $student->ogrenci_belgesi;
-                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_ogrenci_belgesi.' . pathinfo($filePath, PATHINFO_EXTENSION);
+                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_ogrenci_belgesi.pdf' . pathinfo($filePath, PATHINFO_EXTENSION);
                 break;
             default:
                 abort(404);
