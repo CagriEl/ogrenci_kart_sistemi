@@ -6,6 +6,7 @@ use App\Models\Student;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SicilOlusturulduMail;
+use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
@@ -53,29 +54,32 @@ class StudentController extends Controller
         $data = $request->all();
         $data['aydinlatma_onay'] = $request->has('aydinlatma_onay') ? true : false;
     
-        if ($request->hasFile('ogrenci_belgesi')) {
-            $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->store('ogrenci_belgeleri', 'public');
-        }
-    
+       
         if ($request->hasFile('vesikalik')) {
-            $filename = $request->tc . '_' . str_replace(' ', '_', $request->ad_soyad) . '_vesikalik.' . $request->file('vesikalik')->getClientOriginalExtension();
+            $originalName = pathinfo($request->file('vesikalik')->getClientOriginalName(), PATHINFO_FILENAME);
+            $shortenedName = Str::limit($originalName, 20, ''); // Dosya adını 20 karakterle sınırlıyoruz
+            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
             $data['vesikalik'] = $request->file('vesikalik')->storeAs('vesikalik_fotograflar', $filename, 'public');
         }
-    
+
         if ($request->hasFile('kimlik_on')) {
-            $filename = $request->tc . '_' . str_replace(' ', '_', $request->ad_soyad) . '_kimlik_on.' . $request->file('kimlik_on')->getClientOriginalExtension();
+            $originalName = pathinfo($request->file('kimlik_on')->getClientOriginalName(), PATHINFO_FILENAME);
+            $shortenedName = Str::limit($originalName, 20, ''); // Dosya adını 20 karakterle sınırlıyoruz
+            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
             $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
-    
+
         if ($request->hasFile('kimlik_arka')) {
-            $filename = $request->tc . '_' . str_replace(' ', '_', $request->ad_soyad) . '_kimlik_arka.' . $request->file('kimlik_arka')->getClientOriginalExtension();
+            $originalName = pathinfo($request->file('kimlik_arka')->getClientOriginalName(), PATHINFO_FILENAME);
+            $shortenedName = Str::limit($originalName, 20, ''); // Dosya adını 20 karakterle sınırlıyoruz
+            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
             $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
-    
+            
         // Veritabanına Kayıt
         Student::create($data);
     
-        return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı.');
+        return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
     }
     
 
@@ -83,9 +87,17 @@ class StudentController extends Controller
     public function adminIndex()
     {
         
-        $students = Student::paginate(20); // Sayfalama başına 20 kayıt
-        return view('admin.students.index', compact('students'));
+     // Sadece "Kart Basıldı" olmayan kayıtları göster
+    $students = Student::where('durum', '!=', 'Kart Basıldı')->paginate(20);
+    return view('admin.students.index', compact('students'));
+    
     }
+    public function basilanKartlar()
+    {
+        $basilanKartlar = Student::where('durum', 'Kart Basıldı')->paginate(20); // get() yerine paginate(20) kullanıyoruz
+        return view('admin.students.basilan_kartlar', compact('basilanKartlar'));
+    }
+    
 
     // Öğrenci kaydının düzenlendiği metot
     public function edit(Student $student)
@@ -156,6 +168,4 @@ class StudentController extends Controller
         $student->delete();
         return redirect()->route('admin.students.index')->with('success', 'Kayıt başarıyla silindi.');
     }
-    
-
 }

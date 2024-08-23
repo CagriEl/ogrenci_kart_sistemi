@@ -30,3 +30,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/admin/approved-students', [StudentController::class, 'approvedStudents'])->name('admin.students.approved');
 
 Route::get('/admin/students/{id}/download/{file_type}', [StudentController::class, 'downloadFile'])->name('admin.students.download');
+Route::middleware(['auth'])->group(function () {
+    Route::get('admin/students/basilan-kartlar', [StudentController::class, 'basilanKartlar'])->name('admin.students.basilan_kartlar');
+});

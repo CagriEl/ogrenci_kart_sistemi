@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -45,28 +48,12 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Admin Paneli</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('logout') }}"
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            Çıkış Yap
-                        </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+
 
     <div class="container mt-4">
         <h1 class="text-center">Öğrenci Kayıtları</h1>
-
+        <div class="text-center"><button id="refreshButton" class="btn btn-primary align-center" onclick="location.reload();">Yenile</button></div>
+    </div>
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
@@ -223,3 +210,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+@endsection
