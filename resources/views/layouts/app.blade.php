@@ -17,7 +17,7 @@
                         <a class="nav-link" href="{{ route('admin.students.index') }}">Öğrenci Kayıtları</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.students.basilan_kartlar') }}">Basılan Kartlar</a>
+                        <a class="nav-link" href="{{ route('admin.basilan_kartlar') }}">Basılan Kartlar</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}"
