@@ -62,7 +62,9 @@
         <div class="d-flex justify-content-center">
             {{ $students->onEachSide(1)->links('pagination::bootstrap-4') }}
         </div>
-        
+        <div class="alert alert-danger  text-right" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">
+            {{ $kartBasildiBekleyen }} adet basılmayı bekleyen kart var.
+        </div>
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -196,6 +198,11 @@
                                     <p><strong>Sicil:</strong> {{ $student->sicil }}</p>
                                     <p><strong>Durum:</strong> {{ $student->durum }}</p>
                                 </div>
+                                @if($kartBasildiBekleyen > 0)
+                                <div class="alert alert-warning text-right">
+                                    {{ $kartBasildiBekleyen }} adet basılmayı bekleyen kart var.
+                                </div>
+                            @endif
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
                                 </div>                                

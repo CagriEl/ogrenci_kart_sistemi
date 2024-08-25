@@ -1,42 +1,47 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Faker\Factory as Faker;
+use App\Models\Student;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class StudentsTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        $faker = Faker::create();
+        for ($i = 0; $i < 25; $i++) {
+            // İnternetten görselleri indirip kaydetme
+            $vesikalikImageUrl = 'https://picsum.photos/640/480';
+            $vesikalikImage = 'vesikalik_fotograflar/' . Str::uuid() . '.jpg';
+            Storage::disk('public')->put($vesikalikImage, file_get_contents($vesikalikImageUrl));
 
-        foreach (range(1, 4000) as $index) {
-            DB::table('students')->insert([
-                'ad_soyad' => $faker->name,
-                'tc' => $faker->unique()->numerify('###########'),
-                'baba_adi' => $faker->firstNameMale,
-                'dogum_tarihi' => $faker->date(),
-                'telefon' => $faker->phoneNumber,
-                'dogum_yeri' => $faker->city,
-                'adres' => $faker->address,
-                'email' => $faker->unique()->safeEmail,
-                'bolum' => $faker->word,
-                'ogrenci_belgesi' => null, // Öğrenci belgesi (PDF dosyası) için null bırakabilirsiniz
-                'kimlik_on' => null, // Kimlik ön görseli için null bırakabilirsiniz
-                'kimlik_arka' => null, // Kimlik arka görseli için null bırakabilirsiniz
-                'vesikalik' => null, // Vesikalık fotoğraf için null bırakabilirsiniz
+            $kimlikOnImageUrl = 'https://picsum.photos/640/480';
+            $kimlikOnImage = 'kimlik_fotograflar/' . Str::uuid() . '.jpg';
+            Storage::disk('public')->put($kimlikOnImage, file_get_contents($kimlikOnImageUrl));
+
+            $kimlikArkaImageUrl = 'https://picsum.photos/640/480';
+            $kimlikArkaImage = 'kimlik_fotograflar/' . Str::uuid() . '.jpg';
+            Storage::disk('public')->put($kimlikArkaImage, file_get_contents($kimlikArkaImageUrl));
+
+            
+
+            Student::create([
+                'ad_soyad' => 'Öğrenci ' . $i,
+                'tc' => '2222222222' . $i, // TC numarasını sabit tutuyoruz
+                'telefon' => '0543' . random_int(1000000, 9999999),
+                'adres' => 'Adres ' . $i,
+                'bolum' => 'Bölüm ' . $i,
+                'kimlik_on' => $kimlikOnImage,
+                'kimlik_arka' => $kimlikArkaImage,
+                'vesikalik' => $vesikalikImage,
+                'dogum_tarihi' => now()->subYears(random_int(18, 25))->format('Y-m-d'),
+                'baba_adi' => 'Baba ' . $i,
+                'dogum_yeri' => 'Şehir ' . $i,
+                'email' => 'ogrenci' . $i . '@example.com',
                 'aydinlatma_onay' => true,
                 'durum' => 'İşlem Bekliyor',
-                'sicil' => null, // Sicil numarası için null bırakabilirsiniz
-                'created_at' => now(),
-                'updated_at' => now(),
+                'sicil' => null,
             ]);
         }
     }

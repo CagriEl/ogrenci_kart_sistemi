@@ -6,6 +6,7 @@ use App\Models\Student;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SicilOlusturulduMail;
+use App\Mail\KartBasildiMail;
 use Illuminate\Support\Str;
 
 class StudentController extends Controller
@@ -93,10 +94,10 @@ class StudentController extends Controller
     // Öğrenci kayıtlarının listelendiği admin paneli
     public function adminIndex()
     {
-        
-     // Sadece "Kart Basıldı" olmayan kayıtları göster
-    $students = Student::where('durum', '!=', 'Kart Basıldı')->paginate(20);
-    return view('admin.students.index', compact('students'));
+        $students = Student::where('durum', 'İşlem Bekliyor')->paginate(20);
+    $kartBasildiBekleyen = Student::where('durum', 'Sicil Oluştu - Tahakkuk Girildi')->count();
+
+    return view('admin.students.index', compact('students', 'kartBasildiBekleyen'));
     
     }
     public function basilanKartlar()
@@ -130,6 +131,9 @@ class StudentController extends Controller
         Mail::to($student->email)->send(new SicilOlusturulduMail($student));
     }
 
+    if ($student->durum == 'Kart Basıldı') {
+        Mail::to($student->email)->send(new KartBasildiMail($student));
+    }
     return redirect()->route('admin.students.index')->with('success', 'Öğrenci kaydı başarıyla güncellendi.');
 }
     
@@ -172,9 +176,42 @@ class StudentController extends Controller
     
     }
 
+    public function sicilOlusturulanlar()
+    {
+        $students = Student::where('durum', 'Sicil Oluştu - Tahakkuk Girildi')->paginate(20);
+        return view('admin.students.sicil_olusturulanlar', compact('students'));
+    }
+
     public function destroy(Student $student)
     {
         $student->delete();
         return redirect()->route('admin.students.index')->with('success', 'Kayıt başarıyla silindi.');
     }
-}
+    public function updateStatus(Request $request, $id)
+    {
+        // Mevcut öğrenci kaydını al
+        $student = Student::findOrFail($id);
+    
+        // Eğer kart_basildi checkbox'ı işaretliyse durumu "Kart Basıldı" yap ve mail gönder
+        if ($request->has('kart_basildi')) {
+            $student->durum = 'Kart Basıldı';
+    
+            // Kart Basıldı mailini gönder
+            Mail::to($student->email)->send(new KartBasildiMail($student));
+        } else {
+            // Eğer durum değişikliği "İşlem Bekliyor" ise ve sicil numarası atanmışsa bu işlemi engelle
+            if ($student->sicil && $request->input('durum') == 'İşlem Bekliyor') {
+                return redirect()->back()->with('error', 'Sicil numarası atanmış bir kaydı "İşlem Bekliyor" durumuna geri alamazsınız.');
+            }
+    
+            $student->durum = $request->input('durum');
+        }
+    
+        // Kaydı güncelle
+        $student->save();
+    
+        return redirect()->back()->with('success', 'Durum başarıyla güncellendi.');
+    }
+ 
+    
+    }
