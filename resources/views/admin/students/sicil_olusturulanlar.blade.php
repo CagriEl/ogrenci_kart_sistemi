@@ -16,6 +16,9 @@
                 <th>ID</th>
                 <th>Ad Soyad</th>
                 <th>TC Kimlik No</th>
+                <th>Doğum Yeri</th>
+                <th>Doğum Tarihi</th>
+                <th>Baba Adı</th>
                 <th>Sicil</th>
                 <th>Durum</th>
                 <th>Kart Durumu (Kart Basıldı İse Güncelleyin)</th>
@@ -27,6 +30,9 @@
                     <td>{{$student->id}}</td>
                     <td>{{ $student->ad_soyad }}</td>
                     <td>{{ $student->tc }}</td>
+                    <th>{{$studnets->dogum_yeri}}
+                    <td>{{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</td>
+                    <th>{{$students->baba_adi}}</th>
                     <td>{{ $student->sicil }}</td>
                     <td>{{ $student->durum }}</td>
                     <td>
