@@ -78,7 +78,7 @@ class StudentController extends Controller
         if ($request->hasFile('vesikalik')) {
             $originalName = pathinfo($request->file('vesikalik')->getClientOriginalName(), PATHINFO_FILENAME);
             $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
+            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
             $data['vesikalik'] = $request->file('vesikalik')->storeAs('vesikalik_fotograflar', $filename, 'public');
         }
         
@@ -86,21 +86,21 @@ class StudentController extends Controller
         if ($request->hasFile('kimlik_on')) {
             $originalName = pathinfo($request->file('kimlik_on')->getClientOriginalName(), PATHINFO_FILENAME);
             $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
+            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
             $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
         
         if ($request->hasFile('kimlik_arka')) {
             $originalName = pathinfo($request->file('kimlik_arka')->getClientOriginalName(), PATHINFO_FILENAME);
             $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
+            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
             $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
         
         if ($request->hasFile('ogrenci_belgesi')) {
             $originalName = pathinfo($request->file('ogrenci_belgesi')->getClientOriginalName(), PATHINFO_FILENAME);
             $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('ogrenci_belgesi')->getClientOriginalExtension();
+            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('ogrenci_belgesi')->getClientOriginalExtension();
             $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->storeAs('ogrenci_belgeleri', $filename, 'public');
         }
         
