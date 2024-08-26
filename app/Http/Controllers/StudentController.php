@@ -62,20 +62,21 @@ class StudentController extends Controller
             $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
             $data['vesikalik'] = $request->file('vesikalik')->storeAs('vesikalik_fotograflar', $filename, 'public');
         }
-
+        
         if ($request->hasFile('kimlik_on')) {
             $originalName = pathinfo($request->file('kimlik_on')->getClientOriginalName(), PATHINFO_FILENAME);
             $shortenedName = Str::limit($originalName, 20, ''); // Dosya adını 20 karakterle sınırlıyoruz
             $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
             $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
-
+        
         if ($request->hasFile('kimlik_arka')) {
             $originalName = pathinfo($request->file('kimlik_arka')->getClientOriginalName(), PATHINFO_FILENAME);
             $shortenedName = Str::limit($originalName, 20, ''); // Dosya adını 20 karakterle sınırlıyoruz
             $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
             $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
+        
         if ($request->hasFile('ogrenci_belgesi')) {
             $originalName = pathinfo($request->file('ogrenci_belgesi')->getClientOriginalName(), PATHINFO_FILENAME);
             $shortenedName = Str::limit($originalName, 20, ''); // Dosya adını 20 karakterle sınırlıyoruz
@@ -83,12 +84,14 @@ class StudentController extends Controller
             $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->storeAs('ogrenci_belgeleri', $filename, 'public');
         }
         
-            
+        try{    
         // Veritabanına Kayıt
         Student::create($data);
     
-        return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
-    }
+        return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı.');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Kayıt sırasında bir hata oluştu: ' . $e->getMessage());
+    }    }
     
 
     // Öğrenci kayıtlarının listelendiği admin paneli
