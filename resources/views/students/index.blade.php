@@ -88,13 +88,15 @@
     var telefon = document.getElementById('telefon');
 
     if (dogumTarihi) {
-        dogumTarihi.addEventListener('input', function(e) {
-            const date = new Date(this.value);
-            const year = date.getFullYear();
+        dogumTarihi.addEventListener('blur', function(e) { // 'input' yerine 'blur' olayını kullanıyoruz
+            if (this.value) {
+                const date = new Date(this.value);
+                const year = date.getFullYear();
 
-            if (year < 1900 || year > 2009) {
-                alert('Doğum tarihi 1900-2009 arasında olmalıdır!');
-                this.value = ''; // Hatalı girişi temizler
+                if (year < 1900 || year > 2009) {
+                    alert('Doğum tarihi 1900-2009 arasında olmalıdır!');
+                    this.value = ''; // Hatalı girişi temizler
+                }
             }
         });
     }
