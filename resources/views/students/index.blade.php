@@ -83,25 +83,7 @@
         }
     </style>
 
-    <script>    
-   document.addEventListener('DOMContentLoaded', function() {
-    const dogumTarihiInput = document.getElementById('dogum_tarihi');
-    if (dogumTarihiInput) {
-        dogumTarihiInput.addEventListener('change', function() {
-            const date = new Date(this.value);
-            const year = date.getFullYear();
-
-            if (year < 1950 || year > 2007) {
-                alert('Doğum yılı 1950 ile 2007 arasında olmalıdır.');
-                this.value = ''; // Hatalı girişi temizler
-            }
-        });
-    }
-});
-
-
-    </script>
-
+  
 
 </head>
 <body>
@@ -140,7 +122,7 @@
                            
                             <div class="col-md-6">
                                 <label for="dogum_tarihi" class="form-label">Doğum Tarihi</label>
-                                <input type="date" id="dogum_tarihi" name="dogum_tarihi" required  autocomplete="off" min="1950-01-01" max="2007-12-31">
+                                <input type="date" id="dogum_tarihi" class="form-control" name="dogum_tarihi" required  autocomplete="off" min="1950-01-01" max="2007-12-31">
                             </div>
                         </div>
 
