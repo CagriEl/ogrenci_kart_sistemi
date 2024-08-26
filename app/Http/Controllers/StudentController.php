@@ -56,7 +56,6 @@ class StudentController extends Controller
         $data['aydinlatma_onay'] = $request->has('aydinlatma_onay') ? true : false;
     
        
-        use Illuminate\Support\Str;
 
         function sanitizeFileName($filename)
         {
