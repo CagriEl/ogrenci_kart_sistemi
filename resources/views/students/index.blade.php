@@ -83,35 +83,39 @@
         }
     </style>
      <script>
-       document.addEventListener('DOMContentLoaded', function() {
-    var dogumTarihi = document.getElementById('dogum_tarihi');
-    var telefon = document.getElementById('telefon');
+    script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var telefon = document.getElementById('telefon');
 
-    if (dogumTarihi) {
-        dogumTarihi.addEventListener('blur', function(e) { // 'input' yerine 'blur' olayını kullanıyoruz
-            if (this.value) {
-                const date = new Date(this.value);
-                const year = date.getFullYear();
-
-                if (year < 1900 || year > 2009) {
-                    alert('Doğum tarihi 1900-2009 arasında olmalıdır!');
-                    this.value = ''; // Hatalı girişi temizler
+        if (telefon) {
+            // Kullanıcı alanı seçtiğinde +90 otomatik olarak eklenir
+            telefon.addEventListener('focus', function(e) {
+                if (this.value === '') {
+                    this.value = '+90';
                 }
-            }
-        });
-    }
+            });
 
-    if (telefon) {
-        telefon.addEventListener('input', function(e) {
-            const phone = this.value.replace(/\D/g, ''); // Sadece rakamları alır
-            if (phone.length > 15) {
-                alert('Telefon numarası en fazla 15 haneli olmalıdır!');
-                this.value = phone.substring(0, 15); // Sadece ilk 15 haneyi tutar
-            }
-        });
-    }
-});
+            // Kullanıcının sadece +90 sonrası girmesini sağla
+            telefon.addEventListener('input', function(e) {
+                const input = this.value;
 
+                if (!input.startsWith('+90')) {
+                    this.value = '+90' + input.replace(/^\+/, '').replace(/\D/g, '');
+                } else {
+                    this.value = input.replace(/^\+90/, '+90').replace(/\D/g, '');
+                }
+            });
+
+            // Kullanıcı alanı boş bıraktığında veya +90 dışında bir şey yazmaya çalıştığında düzeltme
+            telefon.addEventListener('blur', function(e) {
+                if (this.value === '+90') {
+                    this.value = '';
+                } else if (!this.value.startsWith('+90')) {
+                    this.value = '+90';
+                }
+            });
+        }
+    });
     </script>
 </head>
 <body>
@@ -157,7 +161,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="telefon" class="form-label">Telefon</label>
-                                <input type="tel" class="form-control" id="telefon" name="telefon" required autocomplete="off" maxlength="15" pattern="\d{10,15}" title="Telefon numarası 10 veya 15 haneli olmalıdır.">
+                                <input type="tel" class="form-control" id="telefon" name="telefon" required autocomplete="off" maxlength="11" pattern="\d{10,11}" title="Telefon numarası 10 veya 11 haneli olmalıdır.">
                             </div>
                             <div class="col-md-6">
                                 <label for="dogum_yeri" class="form-label">Doğum Yeri</label>
