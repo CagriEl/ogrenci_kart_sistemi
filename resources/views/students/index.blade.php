@@ -191,7 +191,7 @@
                     </form>
 
                     <footer>
-                        <p>Kırklareli Belediye Başkanlığı Bilgi İşlem Müdürlüğü tarafından <span style="color:white;">❤</span> ile kodlandı.</p>
+                        <p>Kırklareli Belediye Başkanlığı Bilgi İşlem Müdürlüğü tarafından <span style="color:white!important;">❤</span> ile kodlandı.</p>
                     </footer>
                 </div>
             </div>

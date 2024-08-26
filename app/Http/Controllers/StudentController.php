@@ -21,7 +21,7 @@ class StudentController extends Controller
             'telefon' => 'required|digits_between:10,11', // Telefon numarasını 10 veya 11 hane ile sınırla
             'adres' => 'required|string|max:1000',
             'bolum' => 'required|string|max:255',
-            'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:2048',
+            'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:5120',
             'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'kimlik_arka' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'vesikalik' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -109,7 +109,7 @@ class StudentController extends Controller
         // Veritabanına Kayıt
         Student::create($data);
     
-        return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı.');
+        return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
     } catch (\Exception $e) {
         return redirect()->back()->with('error', 'Kayıt sırasında bir hata oluştu: ' . $e->getMessage());
     }    }
