@@ -83,22 +83,33 @@
         }
     </style>
      <script>
-        document.getElementById('dogum_tarihi').addEventListener('input', function(e) {
+       document.addEventListener('DOMContentLoaded', function() {
+    var dogumTarihi = document.getElementById('dogum_tarihi');
+    var telefon = document.getElementById('telefon');
+
+    if (dogumTarihi) {
+        dogumTarihi.addEventListener('input', function(e) {
             const date = new Date(this.value);
             const year = date.getFullYear();
-    
+
             if (year < 1900 || year > 2009) {
                 alert('Doğum tarihi 1900-2009 arasında olmalıdır!');
                 this.value = ''; // Hatalı girişi temizler
             }
         });
-            document.getElementById('telefon').addEventListener('input', function(e) {
-                const phone = this.value.replace(/\D/g, ''); // Sadece rakamları alır
-                    if (phone.length > 15) {
-                        alert('Telefon numarası en fazla 15 haneli olmalıdır!');
-                        this.value = phone.substring(0, 15); // Sadece ilk 11 haneyi tutar
-                    }
-                });
+    }
+
+    if (telefon) {
+        telefon.addEventListener('input', function(e) {
+            const phone = this.value.replace(/\D/g, ''); // Sadece rakamları alır
+            if (phone.length > 15) {
+                alert('Telefon numarası en fazla 15 haneli olmalıdır!');
+                this.value = phone.substring(0, 15); // Sadece ilk 15 haneyi tutar
+            }
+        });
+    }
+});
+
     </script>
 </head>
 <body>
