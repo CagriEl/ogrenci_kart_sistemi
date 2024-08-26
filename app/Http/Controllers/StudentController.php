@@ -100,13 +100,23 @@ class StudentController extends Controller
     return view('admin.students.index', compact('students', 'kartBasildiBekleyen'));
     
     }
-    public function basilanKartlar()
+    public function basilanKartlar(Request $request)
     {
-        // Durumu 'Kart Basıldı' olan öğrencileri çeker
-        $basilanKartlar = Student::where('durum', 'Kart Basıldı')->paginate(20);
+        // Sorguyu başlat
+        $query = Student::where('durum', 'Kart Basıldı');
     
+        // Eğer bir TC kimlik numarası girilmişse, sorguyu buna göre filtrele
+        if ($request->has('tc') && !empty($request->tc)) {
+            $query->where('tc', $request->tc);
+        }
+    
+        // Sonuçları sayfalandırarak al
+        $basilanKartlar = $query->paginate(20);
+    
+        // Görünümü döndür
         return view('admin.students.basilan-kartlar', compact('basilanKartlar'));
     }
+    
     
 
     // Öğrenci kaydının düzenlendiği metot
@@ -126,7 +136,7 @@ class StudentController extends Controller
     $student->durum = $request->input('durum');
     $student->save();
 
-    //Sicil numarası oluşturulduğunda e-posta gönder
+    // Sicil numarası oluşturulduğunda e-posta gönder
     // if ($student->durum == 'Sicil Oluştu - Tahakkuk Girildi') {
     //     Mail::to($student->email)->send(new SicilOlusturulduMail($student));
     // }
@@ -212,6 +222,7 @@ class StudentController extends Controller
     
         return redirect()->back()->with('success', 'Durum başarıyla güncellendi.');
     }
+    
  
     
     }
