@@ -56,31 +56,52 @@ class StudentController extends Controller
         $data['aydinlatma_onay'] = $request->has('aydinlatma_onay') ? true : false;
     
        
+        use Illuminate\Support\Str;
+
+        function sanitizeFileName($filename)
+        {
+            // Türkçe karakterleri dönüştürme
+            $replacements = [
+                'ç' => 'c', 'ğ' => 'g', 'ı' => 'i', 'İ' => 'I',
+                'ö' => 'o', 'ş' => 's', 'ü' => 'u', 'Ç' => 'C',
+                'Ğ' => 'G', 'Ö' => 'O', 'Ş' => 'S', 'Ü' => 'U',
+            ];
+        
+            $sanitized = strtr($filename, $replacements);
+            
+            // Diğer özel karakterleri kaldırma ve dosya adını kısa tutma
+            $sanitized = Str::slug($sanitized);
+        
+            return $sanitized;
+        }
+        
+        // Örnek kullanım
         if ($request->hasFile('vesikalik')) {
             $originalName = pathinfo($request->file('vesikalik')->getClientOriginalName(), PATHINFO_FILENAME);
-            $shortenedName = Str::limit($originalName, 150, ''); // Dosya adını 10 karakterle sınırlıyoruz
-            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
+            $sanitizedFilename = sanitizeFileName($originalName);
+            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
             $data['vesikalik'] = $request->file('vesikalik')->storeAs('vesikalik_fotograflar', $filename, 'public');
         }
         
+        // Diğer dosyalar için de aynı işlemi uygulayın
         if ($request->hasFile('kimlik_on')) {
             $originalName = pathinfo($request->file('kimlik_on')->getClientOriginalName(), PATHINFO_FILENAME);
-            $shortenedName = Str::limit($originalName, 150, ''); // Dosya adını 10 karakterle sınırlıyoruz
-            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
+            $sanitizedFilename = sanitizeFileName($originalName);
+            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
             $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
         
         if ($request->hasFile('kimlik_arka')) {
             $originalName = pathinfo($request->file('kimlik_arka')->getClientOriginalName(), PATHINFO_FILENAME);
-            $shortenedName = Str::limit($originalName, 150, ''); // Dosya adını 10 karakterle sınırlıyoruz
-            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
+            $sanitizedFilename = sanitizeFileName($originalName);
+            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
             $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
         }
         
         if ($request->hasFile('ogrenci_belgesi')) {
             $originalName = pathinfo($request->file('ogrenci_belgesi')->getClientOriginalName(), PATHINFO_FILENAME);
-            $shortenedName = Str::limit($originalName, 150, ''); // Dosya adını 10 karakterle sınırlıyoruz
-            $filename = $shortenedName . '_' . Str::uuid() . '.' . $request->file('ogrenci_belgesi')->getClientOriginalExtension();
+            $sanitizedFilename = sanitizeFileName($originalName);
+            $filename = Str::limit($sanitizedFilename, 10, '') . '_' . Str::uuid() . '.' . $request->file('ogrenci_belgesi')->getClientOriginalExtension();
             $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->storeAs('ogrenci_belgeleri', $filename, 'public');
         }
         
