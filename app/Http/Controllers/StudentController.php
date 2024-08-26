@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\SicilOlusturulduMail;
+// use App\Mail\SicilOlusturulduMail;
 use App\Mail\KartBasildiMail;
 use Illuminate\Support\Str;
 
@@ -126,10 +126,10 @@ class StudentController extends Controller
     $student->durum = $request->input('durum');
     $student->save();
 
-    // Sicil numarası oluşturulduğunda e-posta gönder
-    if ($student->durum == 'Sicil Oluştu - Tahakkuk Girildi') {
-        Mail::to($student->email)->send(new SicilOlusturulduMail($student));
-    }
+    //Sicil numarası oluşturulduğunda e-posta gönder
+    // if ($student->durum == 'Sicil Oluştu - Tahakkuk Girildi') {
+    //     Mail::to($student->email)->send(new SicilOlusturulduMail($student));
+    // }
 
     if ($student->durum == 'Kart Basıldı') {
         Mail::to($student->email)->send(new KartBasildiMail($student));
