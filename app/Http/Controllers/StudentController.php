@@ -19,7 +19,7 @@ class StudentController extends Controller
             'ad_soyad' => 'required|string|max:255',
             'tc' => 'required|digits:11|unique:students',
             'telefon' => 'required|digits_between:10,11', // Telefon numarasını 10 veya 11 hane ile sınırla
-            'adres' => 'required|string|max:700',
+            'adres' => 'required|string|max:1000',
             'bolum' => 'required|string|max:255',
             'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:2048',
             'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
