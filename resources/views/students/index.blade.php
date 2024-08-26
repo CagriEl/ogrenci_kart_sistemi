@@ -83,6 +83,43 @@
         }
     </style>
 
+    <script>    
+   document.addEventListener('DOMContentLoaded', function() {
+    const dogumTarihiInput = document.getElementById('dogum_tarihi');
+    if (dogumTarihiInput) {
+        dogumTarihiInput.addEventListener('change', function() {
+            const date = new Date(this.value);
+            const year = date.getFullYear();
+
+            if (year < 1950 || year > 2007) {
+                alert('Doğum yılı 1950 ile 2007 arasında olmalıdır.');
+                this.value = ''; // Hatalı girişi temizler
+            }
+        });
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dogumTarihiInput = document.getElementById('dogum_tarihi');
+    if (dogumTarihiInput) {
+        dogumTarihiInput.addEventListener('change', function() {
+            const date = new Date(this.value);
+            const year = date.getFullYear();
+
+            if (year < 1950 || year > 2007) {
+                alert('Doğum yılı 1950 ile 2007 arasında olmalıdır.');
+                this.value = ''; // Hatalı girişi temizler
+            }
+        });
+    } else {
+        console.error("dogum_tarihi ID'sine sahip öğe bulunamadı.");
+    }
+});
+
+
+    </script>
+
 
 </head>
 <body>
