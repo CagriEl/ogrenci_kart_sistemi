@@ -30,7 +30,7 @@
                     <td>{{$student->id}}</td>
                     <td>{{ $student->ad_soyad }}</td>
                     <td>{{ $student->tc }}</td>
-                    <th>{{$studnets->dogum_yeri}}
+                    <th>{{$studnets->dogum_yeri}}</th>
                     <td>{{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</td>
                     <th>{{$students->baba_adi}}</th>
                     <td>{{ $student->sicil }}</td>
