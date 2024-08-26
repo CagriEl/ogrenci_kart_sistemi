@@ -83,40 +83,7 @@
         }
     </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-        var telefon = document.getElementById('telefon');
 
-        if (telefon) {
-            // Kullanıcı alanı seçtiğinde +90 otomatik olarak eklenir
-            telefon.addEventListener('focus', function(e) {
-                if (this.value === '') {
-                    this.value = '+90';
-                }
-            });
-
-            // Kullanıcının sadece +90 sonrası girmesini sağla
-            telefon.addEventListener('input', function(e) {
-                const input = this.value;
-
-                if (!input.startsWith('+90')) {
-                    this.value = '+90' + input.replace(/^\+/, '').replace(/\D/g, '');
-                } else {
-                    this.value = input.replace(/^\+90/, '+90').replace(/\D/g, '');
-                }
-            });
-
-            // Kullanıcı alanı boş bıraktığında veya +90 dışında bir şey yazmaya çalıştığında düzeltme
-            telefon.addEventListener('blur', function(e) {
-                if (this.value === '+90') {
-                    this.value = '';
-                } else if (!this.value.startsWith('+90')) {
-                    this.value = '+90';
-                }
-            });
-        }
-    });
-    </script>
 </head>
 <body>
     <div class="container mt-4">
