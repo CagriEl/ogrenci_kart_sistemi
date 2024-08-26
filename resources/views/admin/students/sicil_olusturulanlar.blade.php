@@ -32,7 +32,7 @@
                     <td>{{ $student->tc }}</td>
                     <th>{{$student->dogum_yeri}}</th>
                     <td>{{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</td>
-                    <th>{{$students->baba_adi}}</th>
+                    <td>{{ $student->baba_adi }}</td>
                     <td>{{ $student->sicil }}</td>
                     <td>{{ $student->durum }}</td>
                     <td>
