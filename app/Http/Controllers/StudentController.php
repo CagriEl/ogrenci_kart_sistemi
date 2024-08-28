@@ -15,15 +15,13 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         // Validasyon kuralları
-        $request->validate([
+        $validatedData = $request->validate([
             'ad_soyad' => 'required|string|max:255',
             'tc' => 'required|digits:11|unique:students',
             'telefon' => 'required|digits_between:10,11', // Telefon numarasını 10 veya 11 hane ile sınırla
             'adres' => 'required|string|max:1000',
             'bolum' => 'required|string|max:255',
             'ogrenci_belgesi' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
-            // 'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            // 'kimlik_arka' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'vesikalik' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'dogum_tarihi' => [
                 'required',
@@ -51,12 +49,7 @@ class StudentController extends Controller
             return redirect()->back()->withErrors(['dogum_tarihi' => '18 yaşından küçükler başvuru yapamaz.']);
         }
     
-        // Dosya Yükleme ve Veritabanı Kayıt İşlemleri
-        $data = $request->all();
-        $data['aydinlatma_onay'] = $request->has('aydinlatma_onay') ? true : false;
-    
-       
-
+        // Dosya adlarını temizleme fonksiyonu
         function sanitizeFileName($filename)
         {
             // Türkçe karakterleri dönüştürme
@@ -65,56 +58,43 @@ class StudentController extends Controller
                 'ö' => 'o', 'ş' => 's', 'ü' => 'u', 'Ç' => 'C',
                 'Ğ' => 'G', 'Ö' => 'O', 'Ş' => 'S', 'Ü' => 'U',
             ];
-        
+    
             $sanitized = strtr($filename, $replacements);
             
             // Diğer özel karakterleri kaldırma ve dosya adını kısa tutma
-            $sanitized = Str::slug($sanitized);
-        
-            return $sanitized;
+            return Str::slug($sanitized);
         }
-        
-        // Örnek kullanım
+    
+        // Veritabanına Kayıt İşlemleri
+        $data = $request->all();
+        $data['aydinlatma_onay'] = $request->has('aydinlatma_onay') ? true : false;
+    
+        // Dosya yükleme ve adlarını düzenleme
         if ($request->hasFile('vesikalik')) {
             $originalName = pathinfo($request->file('vesikalik')->getClientOriginalName(), PATHINFO_FILENAME);
             $sanitizedFilename = sanitizeFileName($originalName);
             $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
             $data['vesikalik'] = $request->file('vesikalik')->storeAs('vesikalik_fotograflar', $filename, 'public');
         }
-        
-        // Diğer dosyalar için de aynı işlemi uygulayın
-        // if ($request->hasFile('kimlik_on')) {
-        //     $originalName = pathinfo($request->file('kimlik_on')->getClientOriginalName(), PATHINFO_FILENAME);
-        //     $sanitizedFilename = sanitizeFileName($originalName);
-        //     $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
-        //     $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
-        // }
-        
-        // if ($request->hasFile('kimlik_arka')) {
-        //     $originalName = pathinfo($request->file('kimlik_arka')->getClientOriginalName(), PATHINFO_FILENAME);
-        //     $sanitizedFilename = sanitizeFileName($originalName);
-        //     $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
-        //     $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
-        // }
-        
+    
         if ($request->hasFile('ogrenci_belgesi')) {
             $originalName = pathinfo($request->file('ogrenci_belgesi')->getClientOriginalName(), PATHINFO_FILENAME);
             $sanitizedFilename = sanitizeFileName($originalName);
             $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('ogrenci_belgesi')->getClientOriginalExtension();
             $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->storeAs('ogrenci_belgeleri', $filename, 'public');
         }
-        
-        
-        try{    
-        // Veritabanına Kayıt
-        Student::create($data);
     
-        return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Kayıt sırasında bir hata oluştu: ' . $e->getMessage());
-    }    }
+        try {
+            // Veritabanına Kayıt
+            Student::create($data);
     
-
+            return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
+        } catch (\Exception $e) {
+            // Hata durumunda geri dönüş ve hata mesajı
+            return redirect()->back()->with('error', 'Kayıt sırasında bir hata oluştu: ' . $e->getMessage());
+        }
+    }
+    
     // Öğrenci kayıtlarının listelendiği admin paneli
     public function adminIndex()
     {
