@@ -21,7 +21,7 @@ class StudentController extends Controller
             'telefon' => 'required|digits_between:10,11', // Telefon numarasını 10 veya 11 hane ile sınırla
             'adres' => 'required|string|max:1000',
             'bolum' => 'required|string|max:255',
-            'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:5120',
+            'ogrenci_belgesi' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:5120',
             // 'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             // 'kimlik_arka' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'vesikalik' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
