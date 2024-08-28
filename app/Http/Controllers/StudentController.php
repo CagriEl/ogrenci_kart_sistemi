@@ -22,8 +22,8 @@ class StudentController extends Controller
             'adres' => 'required|string|max:1000',
             'bolum' => 'required|string|max:255',
             'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:5120',
-            'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'kimlik_arka' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // 'kimlik_on' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // 'kimlik_arka' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'vesikalik' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'dogum_tarihi' => [
                 'required',
@@ -83,19 +83,19 @@ class StudentController extends Controller
         }
         
         // Diğer dosyalar için de aynı işlemi uygulayın
-        if ($request->hasFile('kimlik_on')) {
-            $originalName = pathinfo($request->file('kimlik_on')->getClientOriginalName(), PATHINFO_FILENAME);
-            $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
-            $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
-        }
+        // if ($request->hasFile('kimlik_on')) {
+        //     $originalName = pathinfo($request->file('kimlik_on')->getClientOriginalName(), PATHINFO_FILENAME);
+        //     $sanitizedFilename = sanitizeFileName($originalName);
+        //     $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_on')->getClientOriginalExtension();
+        //     $data['kimlik_on'] = $request->file('kimlik_on')->storeAs('kimlik_fotograflar', $filename, 'public');
+        // }
         
-        if ($request->hasFile('kimlik_arka')) {
-            $originalName = pathinfo($request->file('kimlik_arka')->getClientOriginalName(), PATHINFO_FILENAME);
-            $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
-            $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
-        }
+        // if ($request->hasFile('kimlik_arka')) {
+        //     $originalName = pathinfo($request->file('kimlik_arka')->getClientOriginalName(), PATHINFO_FILENAME);
+        //     $sanitizedFilename = sanitizeFileName($originalName);
+        //     $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('kimlik_arka')->getClientOriginalExtension();
+        //     $data['kimlik_arka'] = $request->file('kimlik_arka')->storeAs('kimlik_fotograflar', $filename, 'public');
+        // }
         
         if ($request->hasFile('ogrenci_belgesi')) {
             $originalName = pathinfo($request->file('ogrenci_belgesi')->getClientOriginalName(), PATHINFO_FILENAME);
@@ -177,14 +177,14 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
 
         switch ($file_type) {
-            case 'kimlik_on':
-                $filePath = $student->kimlik_on;
-                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_kimlik_on.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                break;
-            case 'kimlik_arka':
-                $filePath = $student->kimlik_arka;
-                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_kimlik_arka.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                break;
+            // case 'kimlik_on':
+            //     $filePath = $student->kimlik_on;
+            //     $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_kimlik_on.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            //     break;
+            // case 'kimlik_arka':
+            //     $filePath = $student->kimlik_arka;
+            //     $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_kimlik_arka.' . pathinfo($filePath, PATHINFO_EXTENSION);
+            //     break;
             case 'vesikalik':
                 $filePath = $student->vesikalik;
                 $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_vesikalik.' . pathinfo($filePath, PATHINFO_EXTENSION);

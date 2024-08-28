@@ -159,7 +159,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        {{-- <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="kimlik_on" class="form-label">Kimlik Ön Görsel</label>
                                 <input type="file" class="form-control" id="kimlik_on" name="kimlik_on" accept="image/*" required>
@@ -168,7 +168,7 @@
                                 <label for="kimlik_arka" class="form-label">Kimlik Arka Görsel</label>
                                 <input type="file" class="form-control" id="kimlik_arka" name="kimlik_arka" accept="image/*" required>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="row mb-3">
                             <div class="col-md-12">

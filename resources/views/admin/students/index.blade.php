@@ -79,8 +79,8 @@
                     <th>E-Mail</th>
                     <th>Bölüm</th>
                     <th>Öğrenci Belgesi</th>
-                    <th>Kimlik Ön</th>
-                    <th>Kimlik Arka</th>
+                    {{-- <th>Kimlik Ön</th>
+                    <th>Kimlik Arka</th> --}}
                     <th>Vesikalık Fotoğraf</th>
                     <th>Sicil</th>
                     <th>Durum</th>
@@ -109,7 +109,7 @@
                                 Yok
                             @endif
                         </td>
-                        <td>
+                        {{-- <td>
                             @if($student->kimlik_on)
                                 <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'kimlik_on']) }}" class="btn btn-info btn-sm">
                                     Ön Yüz İndir
@@ -126,7 +126,7 @@
                             @else
                                 Yok
                             @endif
-                        </td>
+                        </td> --}}
                         <td>
                             @if($student->vesikalik)
                                 <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'vesikalik']) }}" class="btn btn-info btn-sm">
@@ -174,7 +174,7 @@
                                             Yok
                                         @endif
                                     </p>
-                                    <p><strong>Kimlik Ön:</strong> 
+                                    {{-- <p><strong>Kimlik Ön:</strong> 
                                         @if($student->kimlik_on)
                                             <a href="{{ Storage::url($student->kimlik_on) }}" target="_blank">Görüntüle</a>
                                         @else
@@ -187,7 +187,7 @@
                                         @else
                                             Yok
                                         @endif
-                                    </p>
+                                    </p> --}}
                                     <p><strong>Vesikalık Fotoğraf:</strong> 
                                         @if($student->vesikalik)
                                         <a href="{{ Storage::url($student->vesikalik) }}" target="_blank">Görüntüle</a>
