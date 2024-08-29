@@ -45,14 +45,81 @@
         .modal-body p {
             margin-bottom: 10px;
         }
+        @media print {
+            .table {
+                width: 100%;
+                margin-bottom: 1rem;
+                color: #212529;
+                background-color: transparent;
+            }
+
+            .table th, .table td {
+                padding: 0.75rem;
+                vertical-align: top;
+                border-top: 1px solid #dee2e6;
+            }
+
+            .table thead th {
+                vertical-align: bottom;
+                border-bottom: 2px solid #dee2e6;
+            }
+
+            .table tbody + tbody {
+                border-top: 2px solid #dee2e6;
+            }
+        }
     </style>
+    <script>
+        function printAllStudents() {
+            var content = '';
+
+            @foreach($students as $student)
+                content += `
+                    <div>
+                        <p><strong>Ad Soyad:</strong> {{ $student->ad_soyad }}</p>
+                        <p><strong>TC Kimlik No:</strong> {{ $student->tc }}</p>
+                        <p><strong>Baba Adı:</strong> {{ $student->baba_adi }}</p>
+                        <p><strong>Doğum Tarihi:</strong> {{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</p>
+                        <p><strong>Doğum Yeri:</strong> {{ $student->dogum_yeri }}</p>
+                        <p><strong>Telefon:</strong> {{ $student->telefon }}</p>
+                        <p><strong>Adres:</strong> {{ $student->adres }}</p>
+                        <p><strong>E-Mail:</strong> {{ $student->email }}</p>
+                        <hr>
+                    </div>
+                `;
+            @endforeach
+
+            var printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Tüm Öğrenci Kayıtları</title>');
+            printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(content);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function printModalContent(studentId) {
+            var content = document.getElementById('modalContent' + studentId).innerHTML;
+            var printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Öğrenci Detayları</title>');
+            printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(content);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
 </head>
 <body>
 
-
     <div class="container mt-4">
         <h1 class="text-center">Öğrenci Kayıtları</h1>
-        <div class="text-center"><button id="refreshButton" class="btn btn-primary align-center" onclick="location.reload();">Yenile</button></div>
+        <div class="text-center"><button id="refreshButton" class="btn btn-primary align-center" onclick="location.reload();">Yenile</button></div><br>
+
+        <div class="text-center"><button type="button" class="btn btn-warning" onclick="printAllStudents()">Tüm Kayıtları Yazdır</button></div>
+
     </div>
         @if(session('success'))
             <div class="alert alert-success">
@@ -79,8 +146,6 @@
                     <th>E-Mail</th>
                     <th>Bölüm</th>
                     <th>Öğrenci Belgesi</th>
-                    {{-- <th>Kimlik Ön</th>
-                    <th>Kimlik Arka</th> --}}
                     <th>Vesikalık Fotoğraf</th>
                     <th>Sicil</th>
                     <th>Durum</th>
@@ -109,24 +174,6 @@
                                 Yok
                             @endif
                         </td>
-                        {{-- <td>
-                            @if($student->kimlik_on)
-                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'kimlik_on']) }}" class="btn btn-info btn-sm">
-                                    Ön Yüz İndir
-                                </a>
-                            @else
-                                Yok
-                            @endif
-                        </td>
-                        <td>
-                            @if($student->kimlik_arka)
-                                <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'kimlik_arka']) }}" class="btn btn-info btn-sm">
-                                    Arka Yüz İndir
-                                </a>
-                            @else
-                                Yok
-                            @endif
-                        </td> --}}
                         <td>
                             @if($student->vesikalik)
                                 <a href="{{ route('admin.students.download', ['id' => $student->id, 'file_type' => 'vesikalik']) }}" class="btn btn-info btn-sm">
@@ -148,8 +195,10 @@
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewStudentModal{{ $student->id }}">
                                 Görüntüle
                             </button>
+                            <button type="button" class="btn btn-primary" onclick="printModalContent({{ $student->id }})">Yazdır</button>
                         </td>
                     </tr>
+
                     <div class="modal fade" id="viewStudentModal{{ $student->id }}" tabindex="-1" aria-labelledby="viewStudentModalLabel{{ $student->id }}" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -157,55 +206,20 @@
                                     <h5 class="modal-title" id="viewStudentModalLabel{{ $student->id }}">Öğrenci Detayları</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body">
+                                <div class="modal-body" id="modalContent{{ $student->id }}">
                                     <p><strong>Ad Soyad:</strong> {{ $student->ad_soyad }}</p>
                                     <p><strong>TC Kimlik No:</strong> {{ $student->tc }}</p>
                                     <p><strong>Baba Adı:</strong> {{ $student->baba_adi }}</p>
-                                    <p><strong>Doğum Tarihi:</strong> {{ $student->dogum_tarihi }}</p>
+                                    <p><strong>Doğum Tarihi:</strong> {{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</p>
                                     <p><strong>Doğum Yeri:</strong> {{ $student->dogum_yeri }}</p>
                                     <p><strong>Telefon:</strong> {{ $student->telefon }}</p>
                                     <p><strong>Adres:</strong> {{ $student->adres }}</p>
                                     <p><strong>E-Mail:</strong> {{ $student->email }}</p>
-                                    <p><strong>Bölüm:</strong> {{ $student->bolum }}</p>
-                                    <p><strong>Öğrenci Belgesi:</strong> 
-                                        @if($student->ogrenci_belgesi)
-                                            <a href="{{ Storage::url($student->ogrenci_belgesi) }}" target="_blank">Görüntüle</a>
-                                        @else
-                                            Yok
-                                        @endif
-                                    </p>
-                                    {{-- <p><strong>Kimlik Ön:</strong> 
-                                        @if($student->kimlik_on)
-                                            <a href="{{ Storage::url($student->kimlik_on) }}" target="_blank">Görüntüle</a>
-                                        @else
-                                            Yok
-                                        @endif
-                                    </p>
-                                    <p><strong>Kimlik Arka:</strong> 
-                                        @if($student->kimlik_arka)
-                                            <a href="{{ Storage::url($student->kimlik_arka) }}" target="_blank">Görüntüle</a>
-                                        @else
-                                            Yok
-                                        @endif
-                                    </p> --}}
-                                    <p><strong>Vesikalık Fotoğraf:</strong> 
-                                        @if($student->vesikalik)
-                                        <a href="{{ Storage::url($student->vesikalik) }}" target="_blank">Görüntüle</a>
-                                    @else
-                                        Yok
-                                    @endif
-                                    </p>
-                                    <p><strong>Sicil:</strong> {{ $student->sicil }}</p>
-                                    <p><strong>Durum:</strong> {{ $student->durum }}</p>
                                 </div>
-                                @if($kartBasildiBekleyen > 0)
-                                <div class="alert alert-warning text-right">
-                                    {{ $kartBasildiBekleyen }} adet basılmayı bekleyen kart var.
-                                </div>
-                            @endif
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                                </div>                                
+                                    <button type="button" class="btn btn-primary" onclick="printModalContent({{ $student->id }})">Yazdır</button>
+                                </div>
                             </div>
                         </div>
                     </div>
