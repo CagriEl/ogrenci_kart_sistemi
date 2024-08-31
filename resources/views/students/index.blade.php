@@ -172,7 +172,8 @@
 
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <label for="vesikalik" class="form-label">Vesikalık Fotoğraf</label>
+                                <label for="vesikalik" class="form-label">Vesikalık Fotoğraf
+                                <br>(Lütfen vesikalık fotoğraflarınızı yükleyiniz. Vesikalık fotoğraf dışında yüklenen fotoğraflar işleme alınmayacaktır.)</label>
                                 <input type="file" class="form-control" id="vesikalik" name="vesikalik" accept="image/*" required>
                             </div>
                         </div>
