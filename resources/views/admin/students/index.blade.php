@@ -116,6 +116,8 @@
 
     <div class="container mt-4">
         <h1 class="text-center">Öğrenci Kayıtları</h1>
+        <h3 class="mb-0" style="color:red;"> İşleme Alınması Gereken Kayıt: {{ $students->total() }} </h3>
+
         <div class="text-center"><button id="refreshButton" class="btn btn-primary align-center" onclick="location.reload();">Yenile</button></div><br>
 
         <div class="text-center"><button type="button" class="btn btn-warning" onclick="printAllStudents()">Tüm Kayıtları Yazdır</button></div>
