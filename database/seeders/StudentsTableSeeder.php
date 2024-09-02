@@ -28,7 +28,7 @@ class StudentsTableSeeder extends Seeder
 
             Student::create([
                 'ad_soyad' => 'Öğrenci ' . $i,
-                'tc' => '2222222222' . $i, // TC numarasını sabit tutuyoruz
+                'tc' => '2000000000' . $i, // TC numarasını sabit tutuyoruz
                 'telefon' => '0543' . random_int(1000000, 9999999),
                 'adres' => 'Adres ' . $i,
                 'bolum' => 'Bölüm ' . $i,
@@ -40,7 +40,7 @@ class StudentsTableSeeder extends Seeder
                 'dogum_yeri' => 'Şehir ' . $i,
                 'email' => 'ogrenci' . $i . '@example.com',
                 'aydinlatma_onay' => true,
-                'durum' => 'İşlem Bekliyor',
+                'durum' => 'Kart Basıldı',
                 'sicil' => null,
             ]);
         }

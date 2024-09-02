@@ -4,11 +4,20 @@
 <div class="container mt-4">
     <h1>Basılan Kartlar</h1>
 
-    <!-- Arama Formu -->
-    <form action="{{ route('admin.students.basilan_kartlar') }}" method="GET" class="form-inline">
-        <input type="text" name="tc" class="form-control" placeholder="TC Kimlik No ile Arama Yapınız" value="{{ request('tc') }}">
-        <button type="submit" class="btn btn-primary ml-2">Ara</button>
-    </form>
+    <!-- Arama Formu ve Toplam Basılan Kart Sayısı -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Arama Formu -->
+        <form action="{{ route('admin.students.basilan_kartlar') }}" method="GET" class="form-inline">
+            <div class="input-group input-group-md">
+                <input type="text" name="tc" class="form-control form-control-md" placeholder="TC Kimlik No ile Arama Yapınız" value="{{ request('tc') }}" style="width: 300px;">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary" style="width: 100px;">Ara</button>
+                </div>
+            </div>
+        </form>
+
+        <h3 class="mb-0">Toplam Basılan Kart: {{ $basilanKartlar->total() }}</h3>
+    </div>
 
     @if($basilanKartlar->isEmpty())
         <p>Aradığınız TC kimlik numarasıyla eşleşen kayıt bulunamadı.</p>
@@ -44,8 +53,9 @@
             </tbody>
         </table>
 
-        <!-- Sayfalama -->
-        {{ $basilanKartlar->links() }}
+        <div class="d-flex justify-content-center">
+            {{ $basilanKartlar->onEachSide(1)->links('pagination::bootstrap-4') }}
+        </div>
     @endif
 </div>
 @endsection
