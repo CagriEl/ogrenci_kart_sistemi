@@ -197,6 +197,9 @@
                             <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewStudentModal{{ $student->id }}">
                                 Görüntüle
                             </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#eksikBelgeModal{{ $student->id }}">
+                                Eksik Belge
+                            </button>
                             <button type="button" class="btn btn-primary" onclick="printModalContent({{ $student->id }})">Yazdır</button>
                         </td>
                     </tr>
@@ -225,6 +228,31 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Eksik Belge Modalı -->
+<div class="modal fade" id="eksikBelgeModal{{ $student->id }}" tabindex="-1" aria-labelledby="eksikBelgeModalLabel{{ $student->id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="eksikBelgeForm" action="{{ route('admin.students.send_eksik_belge', $student->id) }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eksikBelgeModalLabel{{ $student->id }}">Eksik Belge Bildirimi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="aciklama{{ $student->id }}" class="form-label">Açıklama</label>
+                        <textarea name="aciklama" id="aciklama{{ $student->id }}" class="form-control" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-danger">Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
                 @endforeach
             </tbody>
         </table>

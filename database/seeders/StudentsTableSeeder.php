@@ -28,7 +28,7 @@ class StudentsTableSeeder extends Seeder
 
             Student::create([
                 'ad_soyad' => 'Öğrenci ' . $i,
-                'tc' => '3000000000' . $i, // TC numarasını sabit tutuyoruz
+                'tc' => '100000000' . $i, // TC numarasını sabit tutuyoruz
                 'telefon' => '0543' . random_int(1000000, 9999999),
                 'adres' => 'Adres ' . $i,
                 'bolum' => 'Bölüm ' . $i,

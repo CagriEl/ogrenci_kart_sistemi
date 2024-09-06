@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 // use App\Mail\SicilOlusturulduMail;
 use App\Mail\KartBasildiMail;
+use App\Mail\EksikBelgeMail;
 use Illuminate\Support\Str;
 
 class StudentController extends Controller
@@ -227,6 +228,37 @@ class StudentController extends Controller
         return redirect()->back()->with('success', 'Durum başarıyla güncellendi.');
     }
     
- 
+    public function sendEksikBelgeMail(Request $request, $id)
+    {
+        // Öğrenci kaydını al
+        $student = Student::findOrFail($id);
+        
+        // Eksik belge mailini gönder
+        Mail::to($student->email)->send(new EksikBelgeMail($student, $request->aciklama));
+    
+        // Öğrencinin durumunu "Eksik Belge" olarak güncelle
+        $student->durum = 'Eksik Belge - ' . $request->aciklama;
+        $student->save();
+    
+        // Eksik Belge sayfasına yönlendir
+        return redirect()->route('admin.students.index')->with('success', 'Eksik belge maili gönderildi ve öğrenci kaydı "Eksik Belge" olarak işaretlendi.');
+    }
+    
+
+    
+    public function showEksikBelge()
+    {
+        $students = Student::where('durum', 'Eksik Belge')->paginate(20);
+        return view('admin.students.eksik_belge', compact('students'));
+    }
+    public function eksikBelgeOlanlar()
+    {
+        // Durumu 'Eksik Belge' olan kayıtları çeker
+        $eksikBelgeOlanlar = Student::where('durum', 'like', 'Eksik Belge%')->paginate(20);
+        
+        // Görünüm dosyasına eksik belge olanları gönder
+        return view('admin.students.eksik_belge', compact('eksikBelgeOlanlar'));
+    }
+    
     
     }

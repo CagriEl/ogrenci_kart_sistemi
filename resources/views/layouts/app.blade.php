@@ -23,6 +23,10 @@
                         <a class="nav-link" href="{{ route('admin.students.sicil_olusturulanlar') }}">Sicil Oluşturuldu</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.students.eksik_belge') }}">Eksik Belge</a>
+                    </li>
+                    
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Çıkış Yap

@@ -34,3 +34,5 @@ Route::get('/admin/approved-students', [StudentController::class, 'approvedStude
 
 Route::get('/admin/students/{id}/download/{file_type}', [StudentController::class, 'downloadFile'])->name('admin.students.download');
 Route::post('/admin/students/update-status/{id}', [StudentController::class, 'updateStatus'])->name('admin.students.update_status');
+Route::post('admin/students/send_eksik_belge/{id}', [StudentController::class, 'sendEksikBelgeMail'])->name('admin.students.send_eksik_belge');
+Route::get('admin/students/eksik-belge', [StudentController::class, 'eksikBelgeOlanlar'])->name('admin.students.eksik_belge');
