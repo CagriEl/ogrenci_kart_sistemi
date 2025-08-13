@@ -98,8 +98,21 @@ class StudentController extends Controller
         '65 Yas Ustu','Engelli','Engelli Refakatci','Posta','Annekart','Sari Basin','Zabita'
     ];
 
+
+{
+    // Kategoride sadece Öğrenciler başta gelecek şekilde sıralama
+    $students = Student::orderByRaw("CASE WHEN kategori = 'Ogrenci' THEN 0 ELSE 1 END")
+        ->paginate(10);
+
+    // Basılacak kart sayısını bul (sicil oluşturulmuş ama kart basılmamış olanlar)
+    $basilecekKartSayisi = Student::where('status', 'sicil_olusturuldu')->count();
+
+    return view('admin.students.index', compact('students', 'basilecekKartSayisi'));
+}
     return view('admin.students.index', compact('students', 'kartBasildiBekleyen', 'kategoriler'));
 }
+
+
 
     public function basilanKartlar(Request $request)
     {
