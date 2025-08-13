@@ -76,6 +76,17 @@
                                 }
                             @endphp
 
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Başvuru Listesi</h4>
+
+    @if($basilecekKartSayisi > 0)
+        <a href="{{ route('admin.students.basilan_kartlar') }}" 
+           class="btn btn-warning">
+            {{ $basilecekKartSayisi }} adet basılacak kart var
+        </a>
+    @endif
+</div>
+
                             @if($type === 'file')
                                 @php $path = data_get($student, $key); @endphp
                                 <td class="cell-nowrap">
