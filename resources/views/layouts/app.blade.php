@@ -14,7 +14,7 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.students.index') }}">Öğrenci Kayıtları</a>
+                        <a class="nav-link" href="{{ route('admin.students.index') }}">Başvurular</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.students.basilan_kartlar') }}">Basılan Kartlar</a>

@@ -16,7 +16,7 @@
         <h1 class="h4 fw-bold mb-0">📋 Başvuru Listesi</h1>
         <div class="d-flex gap-2">
             <span class="badge bg-primary-subtle text-primary-emphasis">Toplam: {{ number_format($students->total()) }}</span>
-             <a href="{{ route('admin.students.basilan_kartlar') }}"
+             <a href="{{ route('admin.students.sicil_olusturulanlar') }}"
            class="badge text-decoration-none
                   bg-warning-subtle text-warning-emphasis
                   border border-warning-subtle"
