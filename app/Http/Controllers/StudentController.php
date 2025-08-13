@@ -105,7 +105,7 @@ class StudentController extends Controller
         ->paginate(10);
 
     // Basılacak kart sayısını bul (sicil oluşturulmuş ama kart basılmamış olanlar)
-    $basilecekKartSayisi = Student::where('status', 'sicil_olusturuldu')->count();
+    $basilecekKartSayisi = Student::where('durum', 'sicil_olusturuldu')->count();
 
     return view('admin.students.index', compact('students', 'basilecekKartSayisi'));
 }
