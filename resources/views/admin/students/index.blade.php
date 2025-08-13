@@ -16,8 +16,16 @@
         <h1 class="h4 fw-bold mb-0">📋 Başvuru Listesi</h1>
         <div class="d-flex gap-2">
             <span class="badge bg-primary-subtle text-primary-emphasis">Toplam: {{ number_format($students->total()) }}</span>
+             <a href="{{ route('admin.students.basilan_kartlar') }}"
+           class="badge text-decoration-none
+                  bg-warning-subtle text-warning-emphasis
+                  border border-warning-subtle"
+           title="Basılacak kartlar sayfasına git">
+            Basılacak kart: {{ $basilacakKartSayisi }}
+        </a>
         </div>
     </div>
+   
 
     {{-- Filtre --}}
     <form method="GET" action="{{ route('admin.students.index') }}" class="row g-2 align-items-end mb-3">
@@ -76,16 +84,7 @@
                                 }
                             @endphp
 
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Başvuru Listesi</h4>
-
-    @if($basilecekKartSayisi > 0)
-        <a href="{{ route('admin.students.basilan_kartlar') }}" 
-           class="btn btn-warning">
-            {{ $basilecekKartSayisi }} adet basılacak kart var
-        </a>
-    @endif
-</div>
+                            
 
                             @if($type === 'file')
                                 @php $path = data_get($student, $key); @endphp

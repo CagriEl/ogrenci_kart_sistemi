@@ -1,271 +1,376 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+
 use App\Models\Student;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
-// use App\Mail\SicilOlusturulduMail;
-use App\Mail\KartBasildiMail;
-use App\Mail\EksikBelgeMail;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
-    // Form verilerini kaydeden metot
-   public function store(Request $request)
-{
-    // Temel alanlar: tüm kategorilerde var
-    $rules = [
-        'kategori'       => 'required|string',
-        'ad_soyad'       => 'required|string|max:255',
-        'tc'             => 'required|digits:11|unique:applications,tc',
-        'baba_adi'       => 'required|string|max:255',
-        'dogum_tarihi'   => 'required|date|before:today',
-        'telefon'        => 'required|digits_between:10,11',
-        'dogum_yeri'     => 'required|string|max:255',
-        'adres'          => 'required|string|max:1000',
-        'email'          => 'required|email|max:255',
-        'bolum'          => 'nullable|string|max:255',
-
-        // Dosyalar (formlarda kullandığın isimlerle birebir)
-        'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:10240',
-        'belediye_yazi'   => 'nullable|file|mimes:pdf|max:10240',  // Emniyet/Jandarma/Belediye/Gazi/Sehit
-        'vesikalik'       => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        // 'kimlik_on'       => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:10240',
-        // 'kimlik_arka'     => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:10240',
-
-'aydinlatma_onay' => 'accepted',
-    ];
-
-    // Kategoriye özel zorunluluklar (istersen aç)
-    // if ($request->kategori === 'Ogrenci')  $rules['ogrenci_belgesi'] = 'required|file|mimes:pdf|max:10240';
-    // if (in_array($request->kategori, ['Emniyet','Jandarma','Belediye','Gazi','Sehit'])) $rules['belediye_yazi'] = 'required|file|mimes:pdf|max:10240';
-
-    $validated = $request->validate($rules);
-
-    // Bilinen kolonları çek
-    $knownKeys = array_keys($rules);
-    $knownKeys = array_merge($knownKeys, ['durum','sicil']);
-    $data = $request->only($knownKeys);
-
-    // Dosya yükle
-    foreach (['ogrenci_belgesi','belediye_yazi','vesikalik','kimlik_on','kimlik_arka'] as $fileKey) {
-        if ($request->hasFile($fileKey)) {
-            $dir = match ($fileKey) {
-                'ogrenci_belgesi' => 'ogrenci_belgeleri',
-                'vesikalik'       => 'vesikalik',
-                default           => 'ekler',
-            };
-            $data[$fileKey] = $request->file($fileKey)->store($dir, 'public');
-        }
-    }
-
-    // Geri kalan tüm alanları meta'ya koy
-    $exclude = array_merge($knownKeys, ['_token']);
-    $meta = collect($request->all())
-        ->reject(fn($v, $k) => in_array($k, $exclude, true))
-        ->toArray();
-
-    $data['aydinlatma_onay'] = $request->boolean('aydinlatma_onay');
-    $data['meta'] = $meta;
-
-    Student::create($data);
-
-    return back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
-}
-
-    
-    // Öğrenci kayıtlarının listelendiği admin paneli
-    public function adminIndex(Request $request)
-{
-    $query = Student::query();
-
-    // Mevcut mantığın varsa koru: örn. "İşlem Bekliyor"
-    $query->where('durum', 'İşlem Bekliyor');
-
-    // Kategori filtresi (?kategori=Ogretmen vb.)
-    if ($request->filled('kategori')) {
-        $query->where('kategori', $request->string('kategori'));
-    }
-
-    $students = $query->orderByDesc('id')->paginate(20);
-
-    $kartBasildiBekleyen = Student::where('durum', 'Sicil Oluştu - Tahakkuk Girildi')->count();
-
-    $kategoriler = [
-        'Ogrenci','Ogretmen','Belediye','Emniyet','Jandarma','Gazi','Sehit',
-        '65 Yas Ustu','Engelli','Engelli Refakatci','Posta','Annekart','Sari Basin','Zabita'
-    ];
-
-
-{
-    // Kategoride sadece Öğrenciler başta gelecek şekilde sıralama
-    $students = Student::orderByRaw("CASE WHEN kategori = 'Ogrenci' THEN 0 ELSE 1 END")
-        ->paginate(10);
-
-    // Basılacak kart sayısını bul (sicil oluşturulmuş ama kart basılmamış olanlar)
-    $basilecekKartSayisi = Student::where('durum', 'sicil_olusturuldu')->count();
-
-    return view('admin.students.index', compact('students', 'basilecekKartSayisi'));
-}
-    return view('admin.students.index', compact('students', 'kartBasildiBekleyen', 'kategoriler'));
-}
-
-
-
-    public function basilanKartlar(Request $request)
+    /**
+     * Ziyaretçi: Başvuru kaydet (public form POST)
+     */
+    public function store(Request $request)
     {
-        // Sorguyu başlat
-        $query = Student::where('durum', 'Kart Basıldı');
-    
-        // Eğer bir TC kimlik numarası girilmişse, sorguyu buna göre filtrele
-        if ($request->has('tc') && !empty($request->tc)) {
-            $query->where('tc', $request->tc);
-        }
-    
-        // Sonuçları sayfalandırarak al
-        $basilanKartlar = $query->paginate(20);
-    
-        // Görünümü döndür
-        return view('admin.students.basilan-kartlar', compact('basilanKartlar'));
-    }
-    
-    
+        $kategori = $request->input('kategori'); // Ogrenci, Ogretmen, Emniyet, Jandarma, Belediye, Gazi, Sehit, ...
 
-    // Öğrenci kaydının düzenlendiği metot
+        // Temel doğrulama kuralları
+        $baseRules = [
+            'kategori'        => ['required', 'string', 'max:100'],
+            'ad_soyad'        => ['required', 'string', 'max:255'],
+            'tc'              => ['required', 'digits:11'],
+            'telefon'         => ['required', 'regex:/^\d{10,11}$/'],
+            'adres'           => ['required', 'string', 'max:1000'],
+            'email'           => ['required', 'email', 'max:255'],
+            'baba_adi'        => ['nullable', 'string', 'max:255'],
+            'dogum_tarihi'    => ['nullable', 'date'],
+            'dogum_yeri'      => ['nullable', 'string', 'max:255'],
+            'vesikalik'       => ['required', 'image', 'max:4096'], // 4MB
+            'kimlik_on'       => ['nullable', 'image', 'max:4096'],
+            'kimlik_arka'     => ['nullable', 'image', 'max:4096'],
+            'aydinlatma_onay' => ['accepted'],
+        ];
+
+        // Kategoriye özel alanlar
+        $extraRules = [];
+        if ($kategori === 'Ogrenci') {
+            $extraRules['bolum']            = ['required', 'string', 'max:255'];
+            $extraRules['ogrenci_belgesi']  = ['required', 'file', 'mimes:pdf', 'max:10240']; // 10MB
+        } elseif (in_array($kategori, ['Emniyet','Jandarma','Ogretmen','Belediye','Gazi','Sehit'], true)) {
+            $extraRules['belediye_yazi']    = ['required', 'file', 'mimes:pdf', 'max:10240'];
+        }
+
+        $data = $request->validate($baseRules + $extraRules);
+
+        // Dosyalar
+        $paths = [];
+        if ($request->hasFile('vesikalik')) {
+            $paths['vesikalik'] = $request->file('vesikalik')->store('vesikalik', 'public');
+        }
+        if ($request->hasFile('kimlik_on')) {
+            $paths['kimlik_on'] = $request->file('kimlik_on')->store('kimlikler', 'public');
+        }
+        if ($request->hasFile('kimlik_arka')) {
+            $paths['kimlik_arka'] = $request->file('kimlik_arka')->store('kimlikler', 'public');
+        }
+        if ($request->hasFile('ogrenci_belgesi')) {
+            $paths['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->store('ogrenci_belgeleri', 'public');
+        }
+        if ($request->hasFile('belediye_yazi')) {
+            $paths['belediye_yazi'] = $request->file('belediye_yazi')->store('resmi_belgeler', 'public');
+        }
+
+        // Kayıt
+        $student = new Student();
+        $student->kategori        = $data['kategori'];
+        $student->ad_soyad        = $data['ad_soyad'];
+        $student->tc              = $data['tc'];
+        $student->telefon         = $data['telefon'];
+        $student->adres           = $data['adres'];
+        $student->email           = $data['email'];
+        $student->baba_adi        = $data['baba_adi'] ?? null;
+        $student->dogum_tarihi    = $data['dogum_tarihi'] ?? null;
+        $student->dogum_yeri      = $data['dogum_yeri'] ?? null;
+        $student->bolum           = $data['bolum'] ?? null;
+        $student->ogrenci_belgesi = $paths['ogrenci_belgesi'] ?? null;
+        $student->belediye_yazi   = $paths['belediye_yazi'] ?? null;
+        $student->vesikalik       = $paths['vesikalik'] ?? null;
+        $student->kimlik_on       = $paths['kimlik_on'] ?? null;
+        $student->kimlik_arka     = $paths['kimlik_arka'] ?? null;
+        $student->aydinlatma_onay = $request->boolean('aydinlatma_onay');
+        $student->durum           = 'İşlem Bekliyor';
+        $student->sicil           = $student->sicil ?? null;
+
+        $student->save();
+
+        return back()->with('success', 'Başvurunuz alınmıştır. Teşekkür ederiz.');
+    }
+
+    /**
+     * Admin: Başvuru listesi
+     * - Sicil oluşturuldu / tahakkuk girildi / kart basıldı -> ANA LİSTEDE GÖRÜNMEZ
+     * - Kategori seçilmemişse tümü gelir, Öğrenci üstte sıralanır
+     * - Sağ üst rozet: "Basılacak kart" (Sicil Oluşturuldu + Sicil Oluştu - Tahakkuk Girildi)
+     */
+    public function adminIndex(Request $request)
+    {
+        $selectedKategori = $request->get('kategori'); // "" (Tümü) veya "Ogrenci" vb.
+
+        $excludeFromMain = [
+            'Sicil Oluşturuldu',
+            'Sicil Oluştu - Tahakkuk Girildi',
+            'Kart Basıldı',
+        ];
+
+        $query = Student::query()
+            ->whereNotIn('durum', $excludeFromMain);
+
+        if ($selectedKategori !== null && $selectedKategori !== '') {
+            $query->where('kategori', $selectedKategori)
+                  ->orderByDesc('created_at');
+        } else {
+            $query->orderByRaw("CASE WHEN kategori = 'Ogrenci' THEN 0 ELSE 1 END")
+                  ->orderByDesc('created_at');
+        }
+
+        $students = $query->paginate(15)->withQueryString();
+
+        // Basıma aday (kart BASILACAK): sicil oluşturulmuş olanlar
+        $pendingForPrint = ['Sicil Oluşturuldu', 'Sicil Oluştu - Tahakkuk Girildi'];
+        $basilacakKartSayisi = Student::whereIn('durum', $pendingForPrint)->count();
+
+        $kategoriler = [
+            'Ogrenci','Ogretmen','Belediye','Emniyet','Jandarma',
+            'Gazi','Sehit','65 Yas Ustu','Engelli','Engelli Refakatci',
+            'Posta','Annekart','Sari Basin','Zabita',
+        ];
+
+        return view('admin.students.index', [
+            'students'            => $students,
+            'kategoriler'         => $kategoriler,
+            'selectedKategori'    => $selectedKategori ?? '',
+            'basilacakKartSayisi' => $basilacakKartSayisi,
+        ]);
+    }
+
+    /**
+     * Admin: Düzenleme formu
+     */
     public function edit(Student $student)
     {
         return view('admin.students.edit', compact('student'));
     }
 
+    /**
+     * Admin: Güncelle
+     * - Sicil listesinde "Kart Basıldı" işaretlenirse durum "Kart Basıldı" yapılır;
+     *   böylece kayıt Sicil listesinden düşer ve "Basılmış Kartlar" sayfasına taşınır.
+     */
     public function update(Request $request, Student $student)
-{
-    $request->validate([
-        'sicil' => 'nullable|string|max:255',
-        'durum' => 'required|string',
-    ]);
+    {
+        $rules = [
+            'ad_soyad'        => ['required', 'string', 'max:255'],
+            'tc'              => ['required', 'digits:11'],
+            'telefon'         => ['required', 'regex:/^\d{10,11}$/'],
+            'adres'           => ['required', 'string', 'max:1000'],
+            'email'           => ['required', 'email', 'max:255'],
+            'baba_adi'        => ['nullable', 'string', 'max:255'],
+            'dogum_tarihi'    => ['nullable', 'date'],
+            'dogum_yeri'      => ['nullable', 'string', 'max:255'],
+            'bolum'           => ['nullable', 'string', 'max:255'],
+            'durum'           => ['nullable', 'string', 'max:255'],
+            'sicil'           => ['nullable', 'string', 'max:255'],
+            'aydinlatma_onay' => ['nullable', 'boolean'],
 
-    $student->sicil = $request->input('sicil');
-    $student->durum = $request->input('durum');
-    $student->save();
+            // Dosyalar (opsiyonel)
+            'vesikalik'       => ['nullable', 'image', 'max:4096'],
+            'kimlik_on'       => ['nullable', 'image', 'max:4096'],
+            'kimlik_arka'     => ['nullable', 'image', 'max:4096'],
+            'ogrenci_belgesi' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'belediye_yazi'   => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
 
-    // Sicil numarası oluşturulduğunda e-posta gönder
-    // if ($student->durum == 'Sicil Oluştu - Tahakkuk Girildi') {
-    //     Mail::to($student->email)->send(new SicilOlusturulduMail($student));
-    // }
+            // Sicil sayfasındaki checkbox için (varsa)
+            'kart_basildi'    => ['nullable', 'boolean'],
+        ];
 
-    if ($student->durum == 'Kart Basıldı') {
-        Mail::to($student->email)->send(new KartBasildiMail($student));
+        $data = $request->validate($rules);
+
+        // Dosya güncellemeleri
+        foreach (['vesikalik','kimlik_on','kimlik_arka','ogrenci_belgesi','belediye_yazi'] as $f) {
+            if ($request->hasFile($f)) {
+                if ($student->$f) {
+                    Storage::disk('public')->delete($student->$f);
+                }
+                $folder = match ($f) {
+                    'vesikalik'       => 'vesikalik',
+                    'kimlik_on',
+                    'kimlik_arka'     => 'kimlikler',
+                    'ogrenci_belgesi' => 'ogrenci_belgeleri',
+                    'belediye_yazi'   => 'resmi_belgeler',
+                    default           => 'uploads',
+                };
+                $student->$f = $request->file($f)->store($folder, 'public');
+            }
+        }
+
+        // "Kart Basıldı" checkbox'ı işaretlendiyse öncelikli olarak bu set edilsin
+        if ($request->boolean('kart_basildi')) {
+            $student->durum = 'Kart Basıldı';
+        } else {
+            // Checkbox işaretli değilse gönderilen "durum" varsa onu uygula
+            if (isset($data['durum']) && $data['durum'] !== '') {
+                $student->durum = $data['durum'];
+            }
+        }
+
+        // Diğer alanlar
+        $student->ad_soyad     = $data['ad_soyad'];
+        $student->tc           = $data['tc'];
+        $student->telefon      = $data['telefon'];
+        $student->adres        = $data['adres'];
+        $student->email        = $data['email'];
+        $student->baba_adi     = $data['baba_adi'] ?? $student->baba_adi;
+        $student->dogum_tarihi = $data['dogum_tarihi'] ?? $student->dogum_tarihi;
+        $student->dogum_yeri   = $data['dogum_yeri'] ?? $student->dogum_yeri;
+        $student->bolum        = $data['bolum'] ?? $student->bolum;
+        $student->sicil        = $data['sicil'] ?? $student->sicil;
+
+        if ($request->has('aydinlatma_onay')) {
+            $student->aydinlatma_onay = $request->boolean('aydinlatma_onay');
+        }
+
+        $student->save();
+
+        return back()->with('success', 'Kayıt güncellendi.');
     }
-    return redirect()->route('admin.students.index')->with('success', 'Öğrenci kaydı başarıyla güncellendi.');
-}
-    
-    // Dosya indirme işlemi
+
+    /**
+     * Admin: Sil
+     */
+    public function destroy(Student $student)
+    {
+        foreach (['vesikalik','kimlik_on','kimlik_arka','ogrenci_belgesi','belediye_yazi'] as $f) {
+            if ($student->$f) {
+                Storage::disk('public')->delete($student->$f);
+            }
+        }
+        $student->delete();
+
+        return back()->with('success', 'Kayıt silindi.');
+    }
+
+    /**
+     * Admin: Dosya indir
+     */
     public function downloadFile($id, $file_type)
     {
         $student = Student::findOrFail($id);
 
-        switch ($file_type) {
-            // case 'kimlik_on':
-            //     $filePath = $student->kimlik_on;
-            //     $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_kimlik_on.' . pathinfo($filePath, PATHINFO_EXTENSION);
-            //     break;
-            // case 'kimlik_arka':
-            //     $filePath = $student->kimlik_arka;
-            //     $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_kimlik_arka.' . pathinfo($filePath, PATHINFO_EXTENSION);
-            //     break;
-            case 'vesikalik':
-                $filePath = $student->vesikalik;
-                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_vesikalik.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                break;
-            case 'ogrenci_belgesi':
-                $filePath = $student->ogrenci_belgesi;
-                $downloadName = $student->tc . '_' . str_replace(' ', '_', $student->ad_soyad) . '_ogrenci_belgesi.' . pathinfo($filePath, PATHINFO_EXTENSION);
-                break;
-            default:
-                abort(404);
+        $allowed = ['vesikalik','kimlik_on','kimlik_arka','ogrenci_belgesi','belediye_yazi'];
+        if (! in_array($file_type, $allowed, true)) {
+            return back()->with('error', 'Geçersiz dosya tipi.');
         }
 
-        if ($filePath && Storage::disk('public')->exists($filePath)) {
-            $file = Storage::disk('public')->get($filePath);
-            $mimeType = Storage::disk('public')->mimeType($filePath);
-    
-            return response($file, 200)
-                ->header('Content-Type', $mimeType)
-                ->header('Content-Disposition', 'attachment; filename="'.$downloadName.'"');
-        } else {
-            abort(404, 'Dosya bulunamadı.');
+        $path = $student->$file_type;
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            return back()->with('error', 'Dosya bulunamadı.');
         }
-    
+
+        return response()->download(storage_path('app/public/'.$path));
     }
 
-    public function sicilOlusturulanlar()
-    {
-        $students = Student::where('durum', 'Sicil Oluştu - Tahakkuk Girildi')->paginate(20);
-        return view('admin.students.sicil_olusturulanlar', compact('students'));
-    }
-
-    public function destroy(Student $student)
-    {
-        $student->delete();
-        return redirect()->route('admin.students.index')->with('success', 'Kayıt başarıyla silindi.');
-    }
+    /**
+     * Admin: Durum güncelle (Onayla vb.)
+     */
     public function updateStatus(Request $request, $id)
     {
-        // Mevcut öğrenci kaydını al
+        $request->validate([
+            'durum' => ['required', 'string', 'max:255'],
+        ]);
+
         $student = Student::findOrFail($id);
-    
-        // Eğer kart_basildi checkbox'ı işaretliyse durumu "Kart Basıldı" yap ve mail gönder
-        if ($request->has('kart_basildi')) {
-            $student->durum = 'Kart Basıldı';
-    
-            // Kart Basıldı mailini gönder
-            Mail::to($student->email)->send(new KartBasildiMail($student));
-        } else {
-            // Eğer durum değişikliği "İşlem Bekliyor" ise ve sicil numarası atanmışsa bu işlemi engelle
-            if ($student->sicil && $request->input('durum') == 'İşlem Bekliyor') {
-                return redirect()->back()->with('error', 'Sicil numarası atanmış bir kaydı "İşlem Bekliyor" durumuna geri alamazsınız.');
-            }
-    
-            $student->durum = $request->input('durum');
-        }
-    
-        // Kaydı güncelle
+        $student->durum = $request->input('durum');
         $student->save();
-    
-        return redirect()->back()->with('success', 'Durum başarıyla güncellendi.');
+
+        return back()->with('success', 'Durum güncellendi: '.$student->durum);
     }
-    
+
+    /**
+     * Admin: Eksik Belge Bildirimi (modal POST)
+     */
     public function sendEksikBelgeMail(Request $request, $id)
     {
-        // Öğrenci kaydını al
+        $data = $request->validate([
+            'aciklama' => ['required', 'string', 'max:5000'],
+            'durum'    => ['nullable', 'string', 'max:255'],
+        ]);
+
         $student = Student::findOrFail($id);
-        
-        // Eksik belge mailini gönder
-        Mail::to($student->email)->send(new EksikBelgeMail($student, $request->aciklama));
-    
-        // Öğrencinin durumunu "Eksik Belge" olarak güncelle
-        $student->durum = 'Eksik Belge - ' . $request->aciklama;
-        $student->save();
-    
-        // Eksik Belge sayfasına yönlendir
-        return redirect()->route('admin.students.index')->with('success', 'Eksik belge maili gönderildi ve öğrenci kaydı "Eksik Belge" olarak işaretlendi.');
+
+        if (!empty($data['durum'])) {
+            $student->durum = $data['durum'];
+            $student->save();
+        }
+
+        // Burada gerçek mail atmak istersen:
+        // Mail::to($student->email)->send(new \App\Mail\EksikBelgeMail($student, $data['aciklama']));
+
+        Log::info('Eksik Belge bildirimi', [
+            'student_id' => $student->id,
+            'email'      => $student->email,
+            'aciklama'   => $data['aciklama'],
+            'durum'      => $student->durum,
+        ]);
+
+        return back()->with('success', 'Eksik belge bildirimi işlendi.');
     }
-    
-    public function showEksikBelge()
+
+    /**
+     * Onaylananlar
+     */
+    public function approvedStudents()
     {
-        $students = Student::where('durum', 'Eksik Belge')->paginate(20);
-        return view('admin.students.eksik_belge', compact('students'));
+        $students = Student::where('durum', 'Onaylandı')
+            ->latest()->paginate(15);
+
+        return view('admin.students.index', [
+            'students'            => $students,
+            'kategoriler'         => [],
+            'selectedKategori'    => '',
+            'basilacakKartSayisi' => Student::whereIn('durum', ['Sicil Oluşturuldu','Sicil Oluştu - Tahakkuk Girildi'])->count(),
+        ]);
     }
+
+    /**
+     * Basılmış Kartlar (yalnızca "Kart Basıldı")
+     */
+    public function basilanKartlar(Request $request)
+    {
+        $students = Student::where('durum', 'Kart Basıldı')
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.students.index', [
+            'students'            => $students,
+            'kategoriler'         => [],
+            'selectedKategori'    => '',
+            'basilacakKartSayisi' => Student::whereIn('durum', ['Sicil Oluşturuldu','Sicil Oluştu - Tahakkuk Girildi'])->count(),
+        ]);
+    }
+
+    /**
+     * Sicil Oluşturulanlar (basıma adaylar)
+     */
+    public function sicilOlusturulanlar()
+    {
+        $students = Student::whereIn('durum', ['Sicil Oluşturuldu', 'Sicil Oluştu - Tahakkuk Girildi'])
+            ->orderByDesc('created_at')
+            ->paginate(15);
+
+        return view('admin.students.index', [
+            'students'            => $students,
+            'kategoriler'         => [],
+            'selectedKategori'    => '',
+            'basilacakKartSayisi' => Student::whereIn('durum', ['Sicil Oluşturuldu','Sicil Oluştu - Tahakkuk Girildi'])->count(),
+        ]);
+    }
+
+    /**
+     * Eksik belge olanlar
+     */
     public function eksikBelgeOlanlar()
     {
-        // Durumu 'Eksik Belge' olan kayıtları çeker
-        $eksikBelgeOlanlar = Student::where('durum', 'like', 'Eksik Belge%')->paginate(20);
-        
-        // Görünüm dosyasına eksik belge olanları gönder
-        return view('admin.students.eksik_belge', compact('eksikBelgeOlanlar'));
+        $students = Student::where('durum', 'Eksik Belge')
+            ->latest()->paginate(15);
+
+        return view('admin.students.index', [
+            'students'            => $students,
+            'kategoriler'         => [],
+            'selectedKategori'    => '',
+            'basilacakKartSayisi' => Student::whereIn('durum', ['Sicil Oluşturuldu','Sicil Oluştu - Tahakkuk Girildi'])->count(),
+        ]);
     }
-    
-    
-    }
+}
