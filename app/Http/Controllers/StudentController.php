@@ -13,98 +13,94 @@ use Illuminate\Support\Str;
 class StudentController extends Controller
 {
     // Form verilerini kaydeden metot
-    public function store(Request $request)
-    {
-        // Validasyon kuralları
-        $validatedData = $request->validate([
-            'ad_soyad' => 'required|string|max:255',
-            'tc' => 'required|digits:11|unique:students',
-            'telefon' => 'required|digits_between:10,11', // Telefon numarasını 10 veya 11 hane ile sınırla
-            'adres' => 'required|string|max:1000',
-            'bolum' => 'required|string|max:255',
-            'ogrenci_belgesi' => 'nullable|file|mimes:pdf,jpeg,png,jpg|max:10240',
-            'vesikalik' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'dogum_tarihi' => [
-                'required',
-                'date',
-                'before:today', // Tarih bugünden önce olmalı
-                function ($attribute, $value, $fail) {
-                    $year = explode('-', $value)[0];
-                    if (strlen($year) !== 4 || !ctype_digit($year)) {
-                        $fail('Doğum tarihi geçersiz. Yıl kısmı 4 haneli olmalıdır.');
-                    }
-                },
-            ],
-            'baba_adi' => 'required|string|max:255',
-            'dogum_yeri' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'aydinlatma_onay' => 'accepted',
-        ]);
-    
-        // 18 yaş kontrolü
-        $dogumTarihi = new \DateTime($request->dogum_tarihi);
-        $today = new \DateTime();
-        $age = $today->diff($dogumTarihi)->y;
-    
-        if ($age < 18) {
-            return redirect()->back()->withErrors(['dogum_tarihi' => '18 yaşından küçükler başvuru yapamaz.']);
-        }
-    
-        // Dosya adlarını temizleme fonksiyonu
-        function sanitizeFileName($filename)
-        {
-            // Türkçe karakterleri dönüştürme
-            $replacements = [
-                'ç' => 'c', 'ğ' => 'g', 'ı' => 'i', 'İ' => 'I',
-                'ö' => 'o', 'ş' => 's', 'ü' => 'u', 'Ç' => 'C',
-                'Ğ' => 'G', 'Ö' => 'O', 'Ş' => 'S', 'Ü' => 'U',
-            ];
-    
-            $sanitized = strtr($filename, $replacements);
-            
-            // Diğer özel karakterleri kaldırma ve dosya adını kısa tutma
-            return Str::slug($sanitized);
-        }
-    
-        // Veritabanına Kayıt İşlemleri
-        $data = $request->all();
-        $data['aydinlatma_onay'] = $request->has('aydinlatma_onay') ? true : false;
-    
-        // Dosya yükleme ve adlarını düzenleme
-        if ($request->hasFile('vesikalik')) {
-            $originalName = pathinfo($request->file('vesikalik')->getClientOriginalName(), PATHINFO_FILENAME);
-            $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('vesikalik')->getClientOriginalExtension();
-            $data['vesikalik'] = $request->file('vesikalik')->storeAs('vesikalik_fotograflar', $filename, 'public');
-        }
-    
-        if ($request->hasFile('ogrenci_belgesi')) {
-            $originalName = pathinfo($request->file('ogrenci_belgesi')->getClientOriginalName(), PATHINFO_FILENAME);
-            $sanitizedFilename = sanitizeFileName($originalName);
-            $filename = Str::limit($sanitizedFilename, 150, '') . '_' . Str::uuid() . '.' . $request->file('ogrenci_belgesi')->getClientOriginalExtension();
-            $data['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->storeAs('ogrenci_belgeleri', $filename, 'public');
-        }
-    
-        try {
-            // Veritabanına Kayıt
-            Student::create($data);
-    
-            return redirect()->back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
-        } catch (\Exception $e) {
-            // Hata durumunda geri dönüş ve hata mesajı
-            return redirect()->back()->with('error', 'Kayıt sırasında bir hata oluştu: ' . $e->getMessage());
+   public function store(Request $request)
+{
+    // Temel alanlar: tüm kategorilerde var
+    $rules = [
+        'kategori'       => 'required|string',
+        'ad_soyad'       => 'required|string|max:255',
+        'tc'             => 'required|digits:11|unique:applications,tc',
+        'baba_adi'       => 'required|string|max:255',
+        'dogum_tarihi'   => 'required|date|before:today',
+        'telefon'        => 'required|digits_between:10,11',
+        'dogum_yeri'     => 'required|string|max:255',
+        'adres'          => 'required|string|max:1000',
+        'email'          => 'required|email|max:255',
+        'bolum'          => 'nullable|string|max:255',
+
+        // Dosyalar (formlarda kullandığın isimlerle birebir)
+        'ogrenci_belgesi' => 'nullable|file|mimes:pdf|max:10240',
+        'belediye_yazi'   => 'nullable|file|mimes:pdf|max:10240',  // Emniyet/Jandarma/Belediye/Gazi/Sehit
+        'vesikalik'       => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+        // 'kimlik_on'       => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:10240',
+        // 'kimlik_arka'     => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:10240',
+
+'aydinlatma_onay' => 'accepted',
+    ];
+
+    // Kategoriye özel zorunluluklar (istersen aç)
+    // if ($request->kategori === 'Ogrenci')  $rules['ogrenci_belgesi'] = 'required|file|mimes:pdf|max:10240';
+    // if (in_array($request->kategori, ['Emniyet','Jandarma','Belediye','Gazi','Sehit'])) $rules['belediye_yazi'] = 'required|file|mimes:pdf|max:10240';
+
+    $validated = $request->validate($rules);
+
+    // Bilinen kolonları çek
+    $knownKeys = array_keys($rules);
+    $knownKeys = array_merge($knownKeys, ['durum','sicil']);
+    $data = $request->only($knownKeys);
+
+    // Dosya yükle
+    foreach (['ogrenci_belgesi','belediye_yazi','vesikalik','kimlik_on','kimlik_arka'] as $fileKey) {
+        if ($request->hasFile($fileKey)) {
+            $dir = match ($fileKey) {
+                'ogrenci_belgesi' => 'ogrenci_belgeleri',
+                'vesikalik'       => 'vesikalik',
+                default           => 'ekler',
+            };
+            $data[$fileKey] = $request->file($fileKey)->store($dir, 'public');
         }
     }
+
+    // Geri kalan tüm alanları meta'ya koy
+    $exclude = array_merge($knownKeys, ['_token']);
+    $meta = collect($request->all())
+        ->reject(fn($v, $k) => in_array($k, $exclude, true))
+        ->toArray();
+
+    $data['aydinlatma_onay'] = $request->boolean('aydinlatma_onay');
+    $data['meta'] = $meta;
+
+    Student::create($data);
+
+    return back()->with('success', 'Başvurunuz başarıyla alındı. Lütfen mailinizi takip ediniz.');
+}
+
     
     // Öğrenci kayıtlarının listelendiği admin paneli
-    public function adminIndex()
-    {
-        $students = Student::where('durum', 'İşlem Bekliyor')->paginate(20);
+    public function adminIndex(Request $request)
+{
+    $query = Student::query();
+
+    // Mevcut mantığın varsa koru: örn. "İşlem Bekliyor"
+    $query->where('durum', 'İşlem Bekliyor');
+
+    // Kategori filtresi (?kategori=Ogretmen vb.)
+    if ($request->filled('kategori')) {
+        $query->where('kategori', $request->string('kategori'));
+    }
+
+    $students = $query->orderByDesc('id')->paginate(20);
+
     $kartBasildiBekleyen = Student::where('durum', 'Sicil Oluştu - Tahakkuk Girildi')->count();
 
-    return view('admin.students.index', compact('students', 'kartBasildiBekleyen'));
-    
-    }
+    $kategoriler = [
+        'Ogrenci','Ogretmen','Belediye','Emniyet','Jandarma','Gazi','Sehit',
+        '65 Yas Ustu','Engelli','Engelli Refakatci','Posta','Annekart','Sari Basin','Zabita'
+    ];
+
+    return view('admin.students.index', compact('students', 'kartBasildiBekleyen', 'kategoriler'));
+}
+
     public function basilanKartlar(Request $request)
     {
         // Sorguyu başlat
@@ -243,8 +239,6 @@ class StudentController extends Controller
         // Eksik Belge sayfasına yönlendir
         return redirect()->route('admin.students.index')->with('success', 'Eksik belge maili gönderildi ve öğrenci kaydı "Eksik Belge" olarak işaretlendi.');
     }
-    
-
     
     public function showEksikBelge()
     {

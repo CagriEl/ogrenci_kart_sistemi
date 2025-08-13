@@ -9,26 +9,21 @@ class Student extends Model
 {
     use HasFactory;
 
-    // Doğru tablo adı belirtildi mi?
-    protected $table = 'students'; // varsayılan olarak 'students' tablosu kullanılır
+    protected $table = 'applications';
 
-    // Toplu atama için uygun olan alanlar
     protected $fillable = [
-        'ad_soyad',
-        'tc',
-        'baba_adi',
-        'dogum_tarihi',
-        'telefon',
-        'dogum_yeri',
-        'adres',
-        'email',
-        'bolum',
-        'ogrenci_belgesi',
-        'kimlik_on',
-        'kimlik_arka',
-        'vesikalik',
-        'aydinlatma_onay',
-        'durum',
-        'sicil'
+        'kategori',
+        'tc','ad_soyad','baba_adi','dogum_tarihi','dogum_yeri',
+        'telefon','adres','email','bolum',
+        // dosya alanları:
+        'ogrenci_belgesi','vesikalik','kimlik_on','kimlik_arka','belediye_yazi',
+        'aydinlatma_onay','durum','sicil',
+        // kategoriye özel alanları JSON’da tutacağız
+        'meta',
+    ];
+
+    protected $casts = [
+        'meta' => 'array',
+        'aydinlatma_onay' => 'boolean',
     ];
 }
