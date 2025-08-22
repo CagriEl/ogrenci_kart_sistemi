@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="col-md-8">
             <div class="form-container">
                 <div class="header-section">
-                    <img src="public/belediye-logo.png" alt="Belediye Logo">
+                    <img src="/public/belediye-logo.png" alt="Belediye Logo">
                     <h2 class="form-title">Kırklareli Belediye Başkanlığı<br>39 Kent Kart<br>Başvuru Formu</h2>
                 </div>
 
