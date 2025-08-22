@@ -102,12 +102,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             <option value="Jandarma">Jandarma Hizmetleri</option>
                             <option value="Gazi">Gazi veya Gazi Yakını</option>
                             <option value="Sehit">Şehit Yakını</option>
-                            <option value="65 Yas Ustu">65 Yaş Üstü</option>
-                            <option value="Engelli">Engelli</option>
-                            <option value="Engelli Refakatci">Engelli ve Refakatçısı</option>
+                            <option value="Engelli_Refakatci">Engelli ve Refakatçısı</option>
                             <option value="Posta">Posta Dağıtıcıları</option>
-                            <option value="Annekart">Annekart</option>
-                            <option value="Sari Basin">Sarı Basın Kartı</option>
+                            {{-- <option value="Annekart">Annekart</option> --}}
+                            <option value="Sari_Basin">Sarı Basın Kartı</option>
                             <option value="Zabita">Belediye Zabıtası</option>
                         </select>
                     </div>
