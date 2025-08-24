@@ -129,8 +129,6 @@ return [
         ['Öğrenci Belgesi' => 'file:ogrenci_belgesi'],
         ['Belediye/Belge (PDF)' => 'file:belediye_yazi'],
         ['Vesikalık' => 'file:vesikalik'],
-        // ['Kimlik Ön' => 'file:kimlik_on'],
-        // ['Kimlik Arka' => 'file:kimlik_arka'],
         ['Sicil' => 'sicil'],
         ['Durum' => 'badge:durum'],
     ],

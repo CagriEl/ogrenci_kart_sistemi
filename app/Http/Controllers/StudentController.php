@@ -29,8 +29,6 @@ class StudentController extends Controller
             'dogum_tarihi'    => ['nullable', 'date'],
             'dogum_yeri'      => ['nullable', 'string', 'max:255'],
             'vesikalik'       => ['required', 'image', 'max:4096'], // 4MB
-            'kimlik_on'       => ['nullable', 'image', 'max:4096'],
-            'kimlik_arka'     => ['nullable', 'image', 'max:4096'],
             'aydinlatma_onay' => ['accepted'],
         ];
 
@@ -50,12 +48,7 @@ class StudentController extends Controller
         if ($request->hasFile('vesikalik')) {
             $paths['vesikalik'] = $request->file('vesikalik')->store('vesikalik', 'public');
         }
-        if ($request->hasFile('kimlik_on')) {
-            $paths['kimlik_on'] = $request->file('kimlik_on')->store('kimlikler', 'public');
-        }
-        if ($request->hasFile('kimlik_arka')) {
-            $paths['kimlik_arka'] = $request->file('kimlik_arka')->store('kimlikler', 'public');
-        }
+        
         if ($request->hasFile('ogrenci_belgesi')) {
             $paths['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->store('ogrenci_belgeleri', 'public');
         }
@@ -78,8 +71,6 @@ class StudentController extends Controller
         $student->ogrenci_belgesi = $paths['ogrenci_belgesi'] ?? null;
         $student->belediye_yazi   = $paths['belediye_yazi'] ?? null;
         $student->vesikalik       = $paths['vesikalik'] ?? null;
-        $student->kimlik_on       = $paths['kimlik_on'] ?? null;
-        $student->kimlik_arka     = $paths['kimlik_arka'] ?? null;
         $student->aydinlatma_onay = $request->boolean('aydinlatma_onay');
         $student->durum           = 'İşlem Bekliyor';
         $student->sicil           = $student->sicil ?? null;
@@ -170,8 +161,6 @@ class StudentController extends Controller
 
             // Dosyalar (opsiyonel)
             'vesikalik'       => ['sometimes','file','image','max:4096'],
-            'kimlik_on'       => ['sometimes','file','image','max:4096'],
-            'kimlik_arka'     => ['sometimes','file','image','max:4096'],
             'ogrenci_belgesi' => ['sometimes','file','mimes:pdf','max:10240'],
             'belediye_yazi'   => ['sometimes','file','mimes:pdf','max:10240'],
 
@@ -182,15 +171,13 @@ class StudentController extends Controller
         $data = $request->validate($rules);
 
         // ---- Dosyalar (gönderilmişse güncelle) ----
-        foreach (['vesikalik','kimlik_on','kimlik_arka','ogrenci_belgesi','belediye_yazi'] as $f) {
+        foreach (['vesikalik','ogrenci_belgesi','belediye_yazi'] as $f) {
             if ($request->hasFile($f)) {
                 if ($student->$f) {
                     Storage::disk('public')->delete($student->$f);
                 }
                 $folder = match ($f) {
                     'vesikalik'       => 'vesikalik',
-                    'kimlik_on',
-                    'kimlik_arka'     => 'kimlikler',
                     'ogrenci_belgesi' => 'ogrenci_belgeleri',
                     'belediye_yazi'   => 'resmi_belgeler',
                     default           => 'uploads',
@@ -237,7 +224,7 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        foreach (['vesikalik','kimlik_on','kimlik_arka','ogrenci_belgesi','belediye_yazi'] as $f) {
+        foreach (['vesikalik','ogrenci_belgesi','belediye_yazi'] as $f) {
             if ($student->$f) {
                 Storage::disk('public')->delete($student->$f);
             }
@@ -254,7 +241,7 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
 
-        $allowed = ['vesikalik','kimlik_on','kimlik_arka','ogrenci_belgesi','belediye_yazi'];
+        $allowed = ['vesikalik','ogrenci_belgesi','belediye_yazi'];
         if (! in_array($file_type, $allowed, true)) {
             return back()->with('error', 'Geçersiz dosya tipi.');
         }
