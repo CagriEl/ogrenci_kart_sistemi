@@ -39,3 +39,47 @@ Auth::routes();
 
 // İsteğe bağlı: /home
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+Route::match(['get','post'], '/upload-test', function (Request $request) {
+    if ($request->isMethod('get')) {
+        return <<<HTML
+<!DOCTYPE html><html lang="tr"><body>
+<h3>Upload Test</h3>
+<form method="POST" enctype="multipart/form-data">
+<input type="hidden" name="_token" value="{$request->session()->token()}">
+<input type="file" name="vesikalik" accept="image/*" required>
+<button type="submit">Yükle</button>
+</form>
+</body></html>
+HTML;
+    }
+
+    if (!$request->hasFile('vesikalik')) {
+        \Log::warning('UploadTest: hasFile=false', ['files' => $request->allFiles()]);
+        return 'DOSYA GELMEDİ (hasFile=false)';
+    }
+
+    $file = $request->file('vesikalik');
+    if (!$file->isValid()) {
+        \Log::warning('UploadTest: isValid=false', [
+            'err_code' => $file->getError(),
+            'err_msg'  => $file->getErrorMessage(),
+            'tmp_dir'  => sys_get_temp_dir(),
+            'ini'      => [
+                'upload_max_filesize' => ini_get('upload_max_filesize'),
+                'post_max_size'       => ini_get('post_max_size'),
+                'file_uploads'        => ini_get('file_uploads'),
+            ],
+        ]);
+        return 'GEÇERSİZ YÜKLEME: err_code=' . $file->getError() . ' tmp=' . sys_get_temp_dir();
+    }
+
+    // Güvenli kayıt
+    $path = Storage::disk('public')->putFile('vesikalik_test', $file);
+    return 'OK: ' . $path;
+});
