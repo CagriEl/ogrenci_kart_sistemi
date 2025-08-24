@@ -16,7 +16,7 @@ class Student extends Model
         'tc','ad_soyad','baba_adi','dogum_tarihi','dogum_yeri',
         'telefon','adres','email','bolum',
         // dosya alanları:
-        'ogrenci_belgesi','vesikalik','kimlik_on','kimlik_arka','belediye_yazi',
+        'ogrenci_belgesi','vesikalik','belediye_yazi',
         'aydinlatma_onay','durum','sicil',
         // kategoriye özel alanları JSON’da tutacağız
         'meta',
