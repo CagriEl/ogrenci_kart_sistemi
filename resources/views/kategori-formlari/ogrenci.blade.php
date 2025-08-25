@@ -16,7 +16,7 @@
   </div>
   <div class="col-md-6">
     <label for="dogum_tarihi" class="form-label">Doğum Tarihi</label>
-    <input type="date" id="dogum_tarihi" class="form-control" name="dogum_tarihi" required min="1950-01-01" max="2007-12-31" value="{{ old('dogum_tarihi') }}">
+    <input type="date" id="dogum_tarihi" class="form-control" name="dogum_tarihi" required min="1950-01-01" max="2004-12-31" value="{{ old('dogum_tarihi') }}">
   </div>
 </div>
 

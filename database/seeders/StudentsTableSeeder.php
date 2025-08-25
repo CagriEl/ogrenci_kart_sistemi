@@ -60,7 +60,7 @@ class StudentsTableSeeder extends Seeder
                     'adres'           => 'Adres Mah. Sok. No:' . random_int(1, 200) . ' / İlçe',
                     'email'           => Str::slug($kategori) . $i . '@example.com',
                     'baba_adi'        => 'Baba ' . $i,
-                    'dogum_tarihi'    => now()->subYears(random_int(18, 45))->format('Y-m-d'),
+                    'dogum_tarihi'    => now()->subYears(random_int(16, 45))->format('Y-m-d'),
                     'dogum_yeri'      => 'Şehir ' . random_int(1, 81),
                     'bolum'           => $kategori === 'Ogrenci' ? 'Bölüm ' . $i : null,
 
