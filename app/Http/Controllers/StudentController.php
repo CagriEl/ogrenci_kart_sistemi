@@ -6,8 +6,8 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use App\Mail\SicilOlusturulduMail;
-// use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Mail;               // << EKLENDİ
+use App\Mail\SicilOlusturulduMail;                // << Mailable sınıfın (dosya ismini/namespace'ini buna uydur)
 
 class StudentController extends Controller
 {
@@ -29,17 +29,17 @@ class StudentController extends Controller
             'baba_adi'        => ['nullable', 'string', 'max:255'],
             'dogum_tarihi'    => ['nullable', 'date'],
             'dogum_yeri'      => ['nullable', 'string', 'max:255'],
-            'vesikalik'       => ['required', 'image', 'max:4096'], // 4MB
+            'vesikalik'       => ['required', 'image', 'max:4096'], // istersen 8192 yapabilirsin
             'aydinlatma_onay' => ['accepted'],
         ];
 
         // Kategoriye özel kurallar
         $extraRules = [];
         if ($kategori === 'Ogrenci') {
-            $extraRules['bolum']            = ['required', 'string', 'max:255'];
-            $extraRules['ogrenci_belgesi']  = ['required', 'file', 'mimes:pdf', 'max:10240']; // 10MB
+            $extraRules['bolum']           = ['required', 'string', 'max:255'];
+            $extraRules['ogrenci_belgesi'] = ['required', 'file', 'mimes:pdf', 'max:10240']; // 10MB
         } elseif (in_array($kategori, ['Emniyet','Jandarma','Ogretmen','Belediye','Gazi','Sehit'], true)) {
-            $extraRules['belediye_yazi']    = ['required', 'file', 'mimes:pdf', 'max:10240'];
+            $extraRules['belediye_yazi']   = ['required', 'file', 'mimes:pdf', 'max:10240'];
         }
 
         $data = $request->validate($baseRules + $extraRules);
@@ -49,7 +49,6 @@ class StudentController extends Controller
         if ($request->hasFile('vesikalik')) {
             $paths['vesikalik'] = $request->file('vesikalik')->store('vesikalik', 'public');
         }
-        
         if ($request->hasFile('ogrenci_belgesi')) {
             $paths['ogrenci_belgesi'] = $request->file('ogrenci_belgesi')->store('ogrenci_belgeleri', 'public');
         }
@@ -95,7 +94,7 @@ class StudentController extends Controller
             'Sicil Oluşturuldu',
             'Sicil Oluştu - Tahakkuk Girildi',
             'Kart Basıldı',
-            'Kart Basildi', // olası i/ı varyasyonu
+            'Kart Basildi',
         ];
 
         $query = Student::query()->whereNotIn('durum', $excludeFromMain);
@@ -207,27 +206,32 @@ class StudentController extends Controller
                 ->with('success', 'Kart basıldı olarak işaretlendi ve listesi güncellendi.');
         }
 
-        // 2) Aksi halde: sicil doluysa ve henüz Kart Basıldı değilse -> Sicil Oluşturuldu
-      // 2) Sicil doluysa ve henüz Kart Basıldı değilse -> Sicil Oluşturuldu + MAIL
-if (filled($student->sicil) && !in_array($student->durum, ['Kart Basıldı','Kart Basildi'], true)) {
-    $student->durum = 'Sicil Oluşturuldu';
-    $student->save();
+        // 2) Sicil doluysa ve henüz Kart Basıldı değilse -> Sicil Oluşturuldu + MAIL
+        if (filled($student->sicil) && !in_array($student->durum, ['Kart Basıldı','Kart Basildi'], true)) {
+            $student->durum = 'Sicil Oluşturuldu';
+            $student->save();
 
-    // ✉️ Mailtrap üzerinden e-posta gönder
-    try {
-        Mail::to($student->email)->send(new SicilOlusturulduMail($student));
-    } catch (\Throwable $e) {
-        \Log::error('SicilOlusturulduMail gönderilemedi', [
-            'student_id' => $student->id,
-            'email' => $student->email,
-            'hata' => $e->getMessage(),
-        ]);
-    }
+            Log::info('SICIL_MAIL_TETIK', [
+                'student_id' => $student->id,
+                'email'      => $student->email,
+                'sicil'      => $student->sicil,
+                'durum'      => $student->durum,
+            ]);
 
-    return redirect()
-        ->route('admin.students.index')
-        ->with('success', 'Kayıt güncellendi ve sicil maili gönderildi.');
-}
+            try {
+                Mail::to($student->email)->send(new SicilOlusturulduMail($student));
+                Log::info('SICIL_MAIL_SENT', ['student_id' => $student->id]);
+            } catch (\Throwable $e) {
+                Log::error('SICIL_MAIL_FAIL', [
+                    'student_id' => $student->id,
+                    'error'      => $e->getMessage(),
+                ]);
+            }
+
+            return redirect()
+                ->route('admin.students.index')
+                ->with('success', 'Kayıt güncellendi ve sicil maili gönderildi.');
+        }
 
         $student->save();
 
@@ -305,7 +309,7 @@ if (filled($student->sicil) && !in_array($student->durum, ['Kart Basıldı','Kar
             $student->save();
         }
 
-        // Mail gönderimi istersen aç:
+        // Mail'i burada da istiyorsan aç:
         // Mail::to($student->email)->send(new \App\Mail\EksikBelgeMail($student, $data['aciklama']));
 
         Log::info('Eksik Belge bildirimi', [
@@ -334,7 +338,7 @@ if (filled($student->sicil) && !in_array($student->durum, ['Kart Basıldı','Kar
     }
 
     /**
-     * Basılmış Kartlar (esnek filtre: 'Kart Basıldı' / 'Kart Basildi' / 'Kart Bas%')
+     * Basılmış Kartlar
      */
     public function basilanKartlar(Request $request)
     {
