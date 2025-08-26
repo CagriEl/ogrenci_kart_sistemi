@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Merhaba, Sayın {{ $adSoyad }}</h1>
-    <p>Öğrenci kartı basılmıştır ve sicil numaranız oluşturulmuştur.</p>
+    <p>Ulaşım kartınzı basılmıştır ve sicil numaranız oluşturulmuştur.</p>
     <p>Sicil Numaranız: <strong>{{ $sicil }}</strong></p>
 
     <p>39 Kent Kart ödemenizi <a href="https://e-belediye.kirklareli.bel.tr">E-Belediye</a> sistemi üzerinden veya belediye veznelerimizden ödeyebilirsiniz.

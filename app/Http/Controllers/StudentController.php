@@ -6,6 +6,7 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Mail\SicilOlusturulduMail;
 // use Illuminate\Support\Facades\Mail;
 
 class StudentController extends Controller
@@ -207,9 +208,26 @@ class StudentController extends Controller
         }
 
         // 2) Aksi halde: sicil doluysa ve henüz Kart Basıldı değilse -> Sicil Oluşturuldu
-        if (filled($student->sicil) && $student->durum !== 'Kart Basıldı' && $student->durum !== 'Kart Basildi') {
-            $student->durum = 'Sicil Oluşturuldu';
-        }
+      // 2) Sicil doluysa ve henüz Kart Basıldı değilse -> Sicil Oluşturuldu + MAIL
+if (filled($student->sicil) && !in_array($student->durum, ['Kart Basıldı','Kart Basildi'], true)) {
+    $student->durum = 'Sicil Oluşturuldu';
+    $student->save();
+
+    // ✉️ Mailtrap üzerinden e-posta gönder
+    try {
+        Mail::to($student->email)->send(new SicilOlusturulduMail($student));
+    } catch (\Throwable $e) {
+        \Log::error('SicilOlusturulduMail gönderilemedi', [
+            'student_id' => $student->id,
+            'email' => $student->email,
+            'hata' => $e->getMessage(),
+        ]);
+    }
+
+    return redirect()
+        ->route('admin.students.index')
+        ->with('success', 'Kayıt güncellendi ve sicil maili gönderildi.');
+}
 
         $student->save();
 
