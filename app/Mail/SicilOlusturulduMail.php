@@ -20,7 +20,7 @@ class SicilOlusturulduMail extends Mailable
 
     public function build()
     {
-        return $this->from('kayit@bkirklareli.bel.tr', 'Kırklareli Belediyesi - 39 Kent Kart Başvurusu')
+        return $this->from('kayit@kirklareli.bel.tr', 'Kırklareli Belediyesi - 39 Kent Kart Başvurusu')
                     ->subject('Siciliniz Oluşturulmuştur')
                     ->view('emails.sicil_olusturuldu')
                     ->with([
