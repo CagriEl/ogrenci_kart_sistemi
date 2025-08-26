@@ -279,18 +279,38 @@ class StudentController extends Controller
     /**
      * Admin: Durum güncelle (satırdaki "Onayla" vb.)
      */
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'durum' => ['required', 'string', 'max:255'],
-        ]);
+    // StudentController@updateStatus  — TAMAMIYLA BUNUNLA DEĞİŞTİRİN
+public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'durum' => ['required', 'string', 'max:255'],
+    ]);
 
-        $student = Student::findOrFail($id);
-        $student->durum = $request->input('durum');
-        $student->save();
+    $student = Student::findOrFail($id);
+    $old = $student->durum;
+    $new = $request->input('durum');
 
-        return back()->with('success', 'Durum güncellendi: '.$student->durum);
+    $student->durum = $new;
+    $student->save();
+
+    // --- Sicil mail tetikleme: hızlı butondan da gelse gönder ---
+    if (in_array($new, ['Sicil Oluşturuldu', 'Sicil Oluştu - Tahakkuk Girildi'], true)) {
+        try {
+            \Log::info('SICIL_MAIL_TETIK(updateStatus)', [
+                'id' => $student->id, 'email' => $student->email, 'durum' => $new
+            ]);
+            Mail::to($student->email)->send(new SicilOlusturulduMail($student));
+            \Log::info('SICIL_MAIL_SENT(updateStatus)', ['id' => $student->id]);
+        } catch (\Throwable $e) {
+            \Log::error('SICIL_MAIL_FAIL(updateStatus)', [
+                'id' => $student->id, 'err' => $e->getMessage()
+            ]);
+        }
     }
+
+    return back()->with('success', "Durum güncellendi: {$old} → {$new}");
+}
+
 
     /**
      * Admin: Eksik Belge Bildirimi (modal POST)
