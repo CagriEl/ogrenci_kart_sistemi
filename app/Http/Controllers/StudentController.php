@@ -22,7 +22,7 @@ class StudentController extends Controller
         $baseRules = [
             'kategori'        => ['required', 'string', 'max:100'],
             'ad_soyad'        => ['required', 'string', 'max:255'],
-            'tc'              => ['required', 'digits:11'],
+            'tc'              => ['required', 'digits:11', 'unique:applications,tc'],
             'telefon'         => ['required', 'regex:/^\d{10,11}$/'],
             'adres'           => ['required', 'string', 'max:1000'],
             'email'           => ['required', 'email', 'max:255'],
@@ -36,13 +36,22 @@ class StudentController extends Controller
         // Kategoriye özel kurallar
         $extraRules = [];
         if ($kategori === 'Ogrenci') {
+            $baseRules['vesikalik']       = ['required', 'image', 'mimes:jpg,jpeg', 'max:4096'];
+            $baseRules['baba_adi']        = ['required', 'string', 'max:255'];
+            $baseRules['dogum_tarihi']    = ['required', 'date'];
+            $baseRules['dogum_yeri']      = ['required', 'string', 'max:255'];
             $extraRules['bolum']           = ['required', 'string', 'max:255'];
             $extraRules['ogrenci_belgesi'] = ['required', 'file', 'mimes:pdf', 'max:10240']; // 10MB
         } elseif (in_array($kategori, ['Emniyet','Jandarma','Ogretmen','Belediye','Gazi','Sehit'], true)) {
             $extraRules['belediye_yazi']   = ['required', 'file', 'mimes:pdf', 'max:10240'];
         }
 
-        $data = $request->validate($baseRules + $extraRules);
+        $data = $request->validate($baseRules + $extraRules, [
+            'tc.unique'        => 'Bu T.C. kimlik numarası ile daha önce başvuru yapılmış.',
+            'vesikalik.mimes'  => 'Vesikalık fotoğraf yalnızca JPG veya JPEG olmalıdır.',
+            'vesikalik.image'  => 'Vesikalık fotoğraf yalnızca JPG veya JPEG olmalıdır.',
+            'ogrenci_belgesi.mimes' => 'Öğrenci belgesi PDF formatında olmalıdır.',
+        ]);
 
         // Dosyaları kaydet
         $paths = [];
@@ -95,6 +104,7 @@ class StudentController extends Controller
             'Sicil Oluştu - Tahakkuk Girildi',
             'Kart Basıldı',
             'Kart Basildi',
+            'Eksik Belge',
         ];
 
         $query = Student::query()->whereNotIn('durum', $excludeFromMain);
@@ -360,25 +370,31 @@ public function updateStatus(Request $request, $id)
     /**
      * Basılmış Kartlar
      */
-    public function basilanKartlar(Request $request)
-    {
-        $students = Student::query()
-            ->where(function($q){
-                $q->where('durum', 'Kart Basıldı')
-                  ->orWhere('durum', 'Kart Basildi')
-                  ->orWhere('durum', 'like', 'Kart Bas%');
-            })
-            ->orderByDesc('created_at')
-            ->paginate(15)
-            ->withQueryString();
+   public function basilanKartlar(Request $request)
+{
+    $tc = trim((string) $request->get('tc', ''));
 
-        return view('admin.students.index', [
-            'students'            => $students,
-            'kategoriler'         => [],
-            'selectedKategori'    => '',
-            'basilacakKartSayisi' => Student::whereIn('durum', ['Sicil Oluşturuldu','Sicil Oluştu - Tahakkuk Girildi'])->count(),
-        ]);
+    $query = Student::query()
+        ->where(function($q){
+            $q->where('durum', 'Kart Basıldı')
+              ->orWhere('durum', 'Kart Basildi')
+              ->orWhere('durum', 'like', 'Kart Bas%');
+        });
+
+    if ($tc !== '') {
+        // Tam eşleşme istiyorsan: $query->where('tc', $tc);
+        $query->where('tc', 'like', "%{$tc}%");
     }
+
+    $basilanKartlar = $query
+        ->orderByDesc('created_at')
+        ->paginate(15)
+        ->withQueryString();
+
+    // ÖNEMLİ: View'a $basilanKartlar adıyla gönderiyoruz
+    return view('admin.students.basilan-kartlar', compact('basilanKartlar'));
+}
+
 
     /**
      * Sicil Oluşturulanlar (basıma adaylar)

@@ -2,60 +2,79 @@
 
 @section('content')
 <div class="container mt-4">
-    <h1>Basılan Kartlar</h1>
+    <h1 class="mb-4">Basılan Kartlar</h1>
 
     <!-- Arama Formu ve Toplam Basılan Kart Sayısı -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <!-- Arama Formu -->
-        <form action="{{ route('admin.students.basilan_kartlar') }}" method="GET" class="form-inline">
-            <div class="input-group input-group-md">
-                <input type="text" name="tc" class="form-control form-control-md" placeholder="TC Kimlik No ile Arama Yapınız" value="{{ request('tc') }}" style="width: 300px;">
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary" style="width: 100px;">Ara</button>
-                </div>
+        <form action="{{ route('admin.students.basilan_kartlar') }}" method="GET" class="mb-3 mb-md-0">
+            <div class="input-group">
+                <input type="text"
+                       name="tc"
+                       class="form-control"
+                       placeholder="TC Kimlik No ile Arama Yapınız"
+                       value="{{ request('tc') }}">
+                <button type="submit" class="btn btn-primary">Ara</button>
             </div>
         </form>
 
-        <h3 class="mb-0">Toplam Basılan Kart: {{ $basilanKartlar->total() }}</h3>
+        <h5 class="text-muted">Toplam Basılan Kart: <strong>{{ $basilanKartlar->total() }}</strong></h5>
     </div>
 
-    @if($basilanKartlar->isEmpty())
-        <p>Aradığınız TC kimlik numarasıyla eşleşen kayıt bulunamadı.</p>
+    @if(($basilanKartlar->total() ?? 0) === 0)
+        <div class="alert alert-warning">Aradığınız TC kimlik numarasıyla eşleşen kayıt bulunamadı.</div>
     @else
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Ad Soyad</th>
-                    <th>TC Kimlik No</th>
-                    <th>Doğum Tarihi</th>
-                    <th>Telefon</th>
-                    <th>Adres</th>
-                    <th>E-Mail</th>
-                    <th>Sicil</th>
-                    <th>Durum</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($basilanKartlar as $student)
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle">
+                <thead class="table-dark">
                     <tr>
-                        <td>{{ $student->id }}</td>
-                        <td>{{ $student->ad_soyad }}</td>
-                        <td>{{ $student->tc }}</td>
-                        <td>{{ \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') }}</td>
-                        <td>{{ $student->telefon }}</td>
-                        <td>{{ $student->adres }}</td>
-                        <td>{{ $student->email }}</td>
-                        <td>{{ $student->sicil }}</td>
-                        <td>{{ $student->durum }}</td>
+                        <th>ID</th>
+                        <th>Ad Soyad</th>
+                        <th>TC Kimlik No</th>
+                        <th>Doğum Tarihi</th>
+                        <th>Telefon</th>
+                        <th>Adres</th>
+                        <th>E-Mail</th>
+                        <th>Sicil</th>
+                        <th>Durum</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach($basilanKartlar as $student)
+                        <tr>
+                            <td>{{ $student->id }}</td>
+                            <td>{{ $student->ad_soyad }}</td>
+                            <td>{{ $student->tc }}</td>
+                            <td>{{ $student->dogum_tarihi ? \Carbon\Carbon::parse($student->dogum_tarihi)->format('d/m/Y') : '-' }}</td>
+                            <td>{{ $student->telefon }}</td>
+                            <td>{{ $student->adres }}</td>
+                            <td>{{ $student->email }}</td>
+                            <td>{{ $student->sicil }}</td>
+                            <td>
+                                <span class="badge bg-success">{{ $student->durum }}</span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center mt-3">
             {{ $basilanKartlar->onEachSide(1)->links('pagination::bootstrap-4') }}
         </div>
     @endif
 </div>
+
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+    .input-group .form-control {
+        max-width: 280px;
+    }
+    .btn-primary {
+        min-width: 90px;
+    }
+</style>
 @endsection
